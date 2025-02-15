@@ -15,7 +15,7 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private Gradient gradientSunsetToNight;
     [SerializeField] private Light globallight;
 
-    
+
 
     private int minutes;
     public int Minutes
@@ -122,4 +122,5 @@ public class TimeManager : MonoBehaviour
         }
     }
 }
+
 
