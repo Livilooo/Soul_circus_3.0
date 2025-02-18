@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TimeManager : MonoBehaviour
@@ -10,35 +11,27 @@ public class TimeManager : MonoBehaviour
     [SerializeField] private Texture2D skyboxDay;
     [SerializeField] private Texture2D skyboxSunset;
     [SerializeField] private Gradient gradientNightToSunrise;
-    [SerializeField] private Gradient gradientSunriesToDay;
+    [SerializeField] private Gradient gradientSunriseToDay;
     [SerializeField] private Gradient gradientDayToSunset;
     [SerializeField] private Gradient gradientSunsetToNight;
-    [SerializeField] private Light globallight;
-
-
-
+    [SerializeField] private Light globalLight;
     private int minutes;
+
     public int Minutes
     {
         get { return minutes; }
-        set
-        {
-            minutes = value;
+        set { minutes = value;
             OnMinutesChange(value);
         }
     }
+
 
     private int hours;
     public int Hours
     {
         get { return hours; }
-        set
-        {
-            hours = value;
-            OnHoursChange(value);
-        }
+        set { hours = value;  OnHoursChange(value); }
     }
-
     private int days;
     public int Days
     {
@@ -46,36 +39,34 @@ public class TimeManager : MonoBehaviour
         set { days = value; }
     }
 
-    private float tempSecond;
-
-    private void Update()
-    {
-        tempSecond += Time.deltaTime;
-        if (tempSecond >= 1)
+    private float tempSeconds;
+    public void Update()
+    { 
+        tempSeconds += Time.deltaTime;
+        if (tempSeconds >= 1)
         {
-            Minutes += 1;
-            tempSecond = 0;
+            minutes += 1;
+            tempSeconds = 0;
         }
     }
 
     private void OnMinutesChange(int value)
     {
-        globallight.transform.Rotate(Vector3.up, (1f / 1440f) * 360f, Space.World);
+        globalLight.transform.Rotate(Vector3.up, (1f/1440f)*360f, Space.World); 
         if (value >= 60)
         {
             Hours++;
             minutes = 0;
         }
-    }
 
-    private void OnHoursChange(int value)
-    {
-        if (value >= 24)
+        if (Hours >= 24)
         {
             Hours = 0;
             Days++;
         }
-
+    }
+    private void OnHoursChange(int value)
+    {
         if (value == 6)
         {
             StartCoroutine(LerpSkybox(skyboxNight, skyboxSunrise, 10f));
@@ -84,7 +75,7 @@ public class TimeManager : MonoBehaviour
         else if (value == 8)
         {
             StartCoroutine(LerpSkybox(skyboxSunrise, skyboxDay, 10f));
-            StartCoroutine(LerpLight(gradientSunriesToDay, 10f));
+            StartCoroutine(LerpLight(gradientSunriseToDay, 10f));
         }
         else if (value == 18)
         {
@@ -103,21 +94,20 @@ public class TimeManager : MonoBehaviour
         RenderSettings.skybox.SetTexture("_Texture1", a);
         RenderSettings.skybox.SetTexture("_Texture2", b);
         RenderSettings.skybox.SetFloat("_Blend", 0);
-
         for (float i = 0; i < time; i += Time.deltaTime)
         {
             RenderSettings.skybox.SetFloat("_Blend", i / time);
             yield return null;
         }
-
         RenderSettings.skybox.SetTexture("_Texture1", b);
     }
 
-    private IEnumerator LerpLight(Gradient lightGradient, float time)
+    private IEnumerator LerpLight(Gradient LightGradient, float time)
     {
         for (float i = 0; i < time; i += Time.deltaTime)
         {
-            globallight.color = lightGradient.Evaluate(i / time); // Fixed typo
+            globalLight.color = LightGradient.Evaluate(i / time);
+            RenderSettings.skybox.SetFloat("_Blend", i / time);
             yield return null;
         }
     }
