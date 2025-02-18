@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# Default ignored files
 /shelf/
 /workspace.xml
@@ -11,3 +12,22 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+=======
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Rider ignored files
+/projectSettingsUpdater.xml
+/contentModel.xml
+/.idea.Soul_circus_3.0.iml
+/modules.xml
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+>>>>>>> 5ce476b7b4b86258b1b746d7583da73beadf4af0
