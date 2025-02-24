@@ -183,7 +183,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 1a94169f48fc36748af9cc18dc5ce23f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -497,10 +497,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.6367366
-  m_Height: 2.9701734
+  m_Radius: 0.75098693
+  m_Height: 2.4238105
   m_Direction: 1
-  m_Center: {x: 0.11865275, y: -1.0285516, z: -0.02457058}
+  m_Center: {x: 0.0044023283, y: -0.37701255, z: -0.02457058}
 --- !u!212 &1530257604
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -542,7 +542,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7d19751373a37204c8c9ef08909c16db, type: 3}
+  m_Sprite: {fileID: -917023107, guid: 159f4fa967f886147b66631160695620, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
