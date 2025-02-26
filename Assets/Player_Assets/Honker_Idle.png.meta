@@ -175,11 +175,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Honker_Idle_0
+      name: Honker_Big
       rect:
         serializedVersion: 2
         x: 29
-        y: 2381
+        y: 2389
         width: 459
         height: 680
       alignment: 0
@@ -196,7 +196,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Honker_Idle_1
+      name: Honker_Idle_Backward
       rect:
         serializedVersion: 2
         x: 28
@@ -205,7 +205,7 @@ TextureImporter:
         height: 321
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 3, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -217,7 +217,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Honker_Idle_2
+      name: Honker_Idle_Forward
       rect:
         serializedVersion: 2
         x: 28
@@ -238,13 +238,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Honker_Idle_3
+      name: Honker_Idle_Right
       rect:
         serializedVersion: 2
         x: 28
         y: 1066
         width: 199
-        height: 335
+        height: 331
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -259,13 +259,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Honker_Idle_4
+      name: Honker_Idle_Left
       rect:
         serializedVersion: 2
         x: 35
         y: 1396
         width: 198
-        height: 333
+        height: 330
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -290,11 +290,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Honker_Idle_0: -1011737921
-      Honker_Idle_1: 2018712660
-      Honker_Idle_2: -917023107
-      Honker_Idle_3: -757466627
-      Honker_Idle_4: 358515353
+      Honker_Big: -1011737921
+      Honker_Idle_Backward: 2018712660
+      Honker_Idle_Forward: -917023107
+      Honker_Idle_Left: 358515353
+      Honker_Idle_Right: -757466627
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
