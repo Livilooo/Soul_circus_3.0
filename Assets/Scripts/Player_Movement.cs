@@ -11,8 +11,6 @@ public class PlayerController : MonoBehaviour {
     private bool isMoving = false;
     private bool isSprinting =false;
     private float yRot;
-    public Animator anim;
-    private int facing = 0;
 
     // private Animator anim;
     private Rigidbody rigidBody;
@@ -23,8 +21,6 @@ public class PlayerController : MonoBehaviour {
         playerSpeed = walkSpeed;
         //anim = GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody>();
-        
-        anim = GetComponent<Animator>();
 
     }
   
@@ -64,33 +60,6 @@ public class PlayerController : MonoBehaviour {
             isSprinting = false;
         }
         
-        
-        // Animator Stuff:
-        // Forward
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            facing = facing + 0;
-        }
-        
-        // Backward
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            facing = facing + 1;
-        }
-        
-        // Right
-        if (Input.GetKeyDown(KeyCode.A)){
-            facing = facing + 2;
-        }
-        
-        // Left
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            facing =facing + 4;
-        }
-        
-        anim.SetInteger("Facing", facing);
-
         //anim.SetBool("isMoving", isMoving);
         //anim.SetBool("isSprinting", isSprinting);
 
