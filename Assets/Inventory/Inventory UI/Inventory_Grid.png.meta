@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -173,7 +173,28 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Inventory_Grid_0
+      rect:
+        serializedVersion: 2
+        x: 1615
+        y: 474
+        width: 1001
+        height: 1321
+      alignment: 9
+      pivot: {x: 0.5027485, y: 0.4396007}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab49c90a5bdd1384f972f80d492612d4
+      internalID: 2084867744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline:
     - - {x: 57, y: -706}
       - {x: 87, y: 640}
@@ -188,7 +209,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Inventory_Grid_0: 2084867744
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
