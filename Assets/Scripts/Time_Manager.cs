@@ -1,126 +1,104 @@
-using System; 
-using System.Collections; 
-using System.Collections.Generic; 
-using Unity.VisualScripting; using UnityEngine;
+using System.Collections;
+using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
+    [Header("Skybox Textures")]
     [SerializeField] private Texture2D skyboxNight;
     [SerializeField] private Texture2D skyboxSunrise;
     [SerializeField] private Texture2D skyboxDay;
     [SerializeField] private Texture2D skyboxSunset;
+
+    [Header("Lighting")]
+    [SerializeField] private Light globalLight;
     [SerializeField] private Gradient gradientNightToSunrise;
     [SerializeField] private Gradient gradientSunriseToDay;
     [SerializeField] private Gradient gradientDayToSunset;
     [SerializeField] private Gradient gradientSunsetToNight;
-    [SerializeField] private Light globalLight;
-    private int minutes;
 
+    [Header("Time Settings")]
+    [SerializeField] private float dayDuration = 864f; // Length of a full day in real-time seconds
+    private float timeElapsed;
+
+    private int minutes;
     public int Minutes
     {
         get { return minutes; }
-        set
+        private set
         {
             minutes = value;
-            OnMinutesChange(value);
+            if (minutes >= 60) { Hours++; minutes = 0; }
         }
     }
 
     private int hours;
-
     public int Hours
     {
         get { return hours; }
-        set
+        private set
         {
             hours = value;
-            OnHoursChange(value);
+            if (hours >= 24) { hours = 0; Days++; }
+            HandleLightingTransitions();
         }
     }
 
     private int days;
+    public int Days { get; private set; }
 
-    public int Days
+    private void Update()
     {
-        get { return days; }
-        set { days = value; }
+        timeElapsed += Time.deltaTime;
+        float timeFactor = (24f / dayDuration) * Time.deltaTime; // Scales to real-time
+
+        // Update time
+        Minutes += Mathf.FloorToInt(timeFactor * 60);
+        globalLight.transform.localRotation = Quaternion.Euler((Hours * 15) % 360, 0, 0); // Smooth rotation
+
+        // Smoothly update the light color based on time of day
+        UpdateLightColor();
     }
 
-    private float tempSeconds;
-
-    public void Update()
+    private void HandleLightingTransitions()
     {
-        tempSeconds += Time.deltaTime;
-        if (tempSeconds >= 1)
+        switch (Hours)
         {
-            Minutes += 1;
-            tempSeconds = 0;
-            
-        }
-    }
-
-    private void OnMinutesChange(int value)
-    {
-        globalLight.transform.Rotate(Vector3.up, (1f / 1440f) * 360f, Space.World); // Rotate light for each minute 
-        if (value >= 60) // Changed 2 to 60 for realistic hour increments
-        {
-            Hours++;
-            Minutes = 0; // Use setter to reset minutes 
-        }
-
-        if (Hours >= 24)
-        {
-            Hours = 0;
-            Days++;
-        }
-    }
-
-    private void OnHoursChange(int value)
-    {
-        if (value == 6)
-        {
-            StartCoroutine(LerpSkybox(skyboxNight, skyboxSunrise, 10f));
-            StartCoroutine(LerpLight(gradientNightToSunrise, 10f));
-        }
-        else if (value == 8)
-        {
-            StartCoroutine(LerpSkybox(skyboxSunrise, skyboxDay, 10f));
-            StartCoroutine(LerpLight(gradientSunriseToDay, 10f));
-        }
-        else if (value == 18)
-        {
-            StartCoroutine(LerpSkybox(skyboxDay, skyboxSunset, 10f));
-            StartCoroutine(LerpLight(gradientDayToSunset, 10f));
-        }
-        else if (value == 22)
-        {
-            StartCoroutine(LerpSkybox(skyboxSunset, skyboxNight, 10f));
-            StartCoroutine(LerpLight(gradientSunsetToNight, 10f));
+            case 6:
+                StartCoroutine(LerpSkybox(skyboxNight, skyboxSunrise, 10f));
+                break;
+            case 8:
+                StartCoroutine(LerpSkybox(skyboxSunrise, skyboxDay, 10f));
+                break;
+            case 18:
+                StartCoroutine(LerpSkybox(skyboxDay, skyboxSunset, 10f));
+                break;
+            case 22:
+                StartCoroutine(LerpSkybox(skyboxSunset, skyboxNight, 10f));
+                break;
         }
     }
 
-    private IEnumerator LerpSkybox(Texture2D a, Texture2D b, float time)
+    private void UpdateLightColor()
     {
-        RenderSettings.skybox.SetTexture("_Texture1", a);
-        RenderSettings.skybox.SetTexture("_Texture2", b);
-        RenderSettings.skybox.SetFloat("_Blend", 0);
-        for (float i = 0; i < time; i += Time.deltaTime)
+        float t = (float)hours / 24f;
+        if (hours < 6) globalLight.color = gradientSunsetToNight.Evaluate(t);
+        else if (hours < 8) globalLight.color = gradientNightToSunrise.Evaluate(t);
+        else if (hours < 18) globalLight.color = gradientSunriseToDay.Evaluate(t);
+        else if (hours < 22) globalLight.color = gradientDayToSunset.Evaluate(t);
+        else globalLight.color = gradientSunsetToNight.Evaluate(t);
+    }
+
+    private IEnumerator LerpSkybox(Texture2D from, Texture2D to, float duration)
+    {
+        RenderSettings.skybox.SetTexture("_Texture1", from);
+        RenderSettings.skybox.SetTexture("_Texture2", to);
+        for (float t = 0; t < 1; t += Time.deltaTime / duration)
         {
-            RenderSettings.skybox.SetFloat("_Blend", i / time);
+            RenderSettings.skybox.SetFloat("_Blend", t);
             yield return null;
         }
-
-        RenderSettings.skybox.SetTexture("_Texture1", b);
-        RenderSettings.skybox.SetFloat("_Blend", 0); // Reset blend after transition
-    }
-
-    private IEnumerator LerpLight(Gradient LightGradient, float time)
-    {
-        for (float i = 0; i < time; i += Time.deltaTime)
-        {
-            globalLight.color = LightGradient.Evaluate(i / time);
-            yield return null;
-        }
+        RenderSettings.skybox.SetTexture("_Texture1", to);
+        RenderSettings.skybox.SetFloat("_Blend", 1);
     }
 }
 

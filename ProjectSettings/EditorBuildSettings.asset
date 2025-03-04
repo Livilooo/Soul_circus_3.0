@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Decaying_Grottos.unity
+    guid: f0360cf16f5440942a8c6b7dfeab5b77
   m_configObjects: {}
