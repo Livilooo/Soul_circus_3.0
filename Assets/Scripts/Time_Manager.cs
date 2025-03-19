@@ -53,10 +53,19 @@ public class TimeManager : MonoBehaviour
 
         // Update time
         Minutes += Mathf.FloorToInt(timeFactor * 60);
-        globalLight.transform.localRotation = Quaternion.Euler((Hours * 15) % 360, 0, 0); // Smooth rotation
+
+        // Calculate the rotation angle based on the time of day
+        float rotationAngle = (timeElapsed / dayDuration) * 360f;
+        globalLight.transform.localRotation = Quaternion.Euler(rotationAngle - 90f, 0f, 0f);
 
         // Smoothly update the light color based on time of day
         UpdateLightColor();
+
+        // Debug logs
+        Debug.Log($"Time Elapsed: {timeElapsed}");
+        Debug.Log($"Minutes: {Minutes}");
+        Debug.Log($"Hours: {Hours}");
+        Debug.Log($"Days: {Days}");
     }
 
     private void HandleLightingTransitions()
@@ -80,26 +89,27 @@ public class TimeManager : MonoBehaviour
 
     private void UpdateLightColor()
     {
-        float t = (float)hours / 24f;
-        if (hours < 6) globalLight.color = gradientSunsetToNight.Evaluate(t);
-        else if (hours < 8) globalLight.color = gradientNightToSunrise.Evaluate(t);
-        else if (hours < 18) globalLight.color = gradientSunriseToDay.Evaluate(t);
-        else if (hours < 22) globalLight.color = gradientDayToSunset.Evaluate(t);
-        else globalLight.color = gradientSunsetToNight.Evaluate(t);
+        float t = (float)Minutes / 60f + Hours;
+        if (Hours < 6) globalLight.color = gradientSunsetToNight.Evaluate(t / 6);
+        else if (Hours < 8) globalLight.color = gradientNightToSunrise.Evaluate((t - 6) / 2);
+        else if (Hours < 18) globalLight.color = gradientSunriseToDay.Evaluate((t - 8) / 10);
+        else if (Hours < 22) globalLight.color = gradientDayToSunset.Evaluate((t - 18) / 4);
+        else globalLight.color = gradientSunsetToNight.Evaluate((t - 22) / 2);
     }
 
     private IEnumerator LerpSkybox(Texture2D from, Texture2D to, float duration)
     {
-        RenderSettings.skybox.SetTexture("_Texture1", from);
-        RenderSettings.skybox.SetTexture("_Texture2", to);
-        for (float t = 0; t < 1; t += Time.deltaTime / duration)
+        Material skyboxMaterial = RenderSettings.skybox;
+        skyboxMaterial.SetTexture("_MainTex", from);
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
         {
-            RenderSettings.skybox.SetFloat("_Blend", t);
+            elapsedTime += Time.deltaTime;
+            skyboxMaterial.SetFloat("_Blend", elapsedTime / duration);
             yield return null;
         }
-        RenderSettings.skybox.SetTexture("_Texture1", to);
-        RenderSettings.skybox.SetFloat("_Blend", 1);
+        skyboxMaterial.SetTexture("_MainTex", to);
+        skyboxMaterial.SetFloat("_Blend", 1);
     }
 }
-
-
