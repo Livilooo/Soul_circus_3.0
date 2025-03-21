@@ -1,12 +1,104 @@
 [
   {
     "id": 0,
-    "title": "Red Bead",
-    "value": 2
+    "title": "Beady Eye",
+    "value": 3,
+    "type": "Blood",
+    "stats": {
+      "power": 4,
+      "defense": -2,
+      "chance": -4,
+      "health": 4,
+      "deals": -2
+    },
+    "description": "You feel like this bead is looking at you... and its hungry.",
+    "stackable": true,
+    "rarity": 6,
+    "slug": "beady_eye"
   },
   {
     "id": 1,
-    "title": "Orange Bead",
-    "value": 2
+    "title": "Infernal Bead",
+    "value": 3,
+    "type": "Fire",
+    "stats": {
+      "power": 6,
+      "defense": -2,
+      "chance": -2,
+      "health": 0,
+      "deals": -2
+    },
+    "description": "This bead feels warm to the touch, burning with rage.",
+    "stackable": true,
+    "rarity": 7,
+    "slug": "infernal_bead"
+  },
+  {
+    "id": 2,
+    "title": "Divine Bead",
+    "value": 4,
+    "type": "Light",
+    "stats": {
+      "power": -5,
+      "defense": 3,
+      "chance": 5,
+      "health": -5,
+      "deals": 2
+    },
+    "description":"You feel like the bead is judging your actions.",
+    "stackable": true,
+    "rarity": 7,
+    "slug": "divine_bead"
+  },
+  { 
+    "id": 3,
+    "title": "Life Bead",
+    "value": 4,
+    "type": "Plant",
+    "stats": {
+      "power": -2,
+      "defense": 3,
+      "chance": -3,
+      "health": 5,
+      "deals": 0
+    },
+    "description":"This bead seems to blend in to the background.",
+    "stackable": true,
+    "rarity": 8,
+    "slug": "life_bead"
+  },
+  {
+    "id": 4,
+    "title":"Frost Bead",
+    "value": 2,
+    "type": "Ice",
+    "stats": {
+      "power": 1,
+      "defense": -1,
+      "chance": -3,
+      "health": 0,
+      "deals": 3
+    },
+    "description":"This bead is cold and harsh. Better avoid a conversation.",
+    "stackable": true,
+    "rarity": 4,
+    "slug": "frost_bead"
+  },
+  {
+    "id": 5,
+    "title": "Soul Bead",
+    "value": 6,
+    "type": "Ghost",
+    "stats": {
+      "power": -5,
+      "defense": -5,
+      "chance": 20,
+      "health": -6,
+      "deals": -4
+    },
+    "description": "You feel close to death; ready to take a chance?",
+    "stackable": true,
+    "rarity": 5,
+    "slug": "soul_bead"
   }
 ]
