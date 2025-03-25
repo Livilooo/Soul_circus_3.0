@@ -593,7 +593,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  dayDuration: 60
+  dayDuration: 864
 --- !u!4 &618939314
 Transform:
   m_ObjectHideFlags: 0
