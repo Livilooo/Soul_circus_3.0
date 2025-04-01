@@ -1,67 +1,69 @@
 using UnityEngine;
-using System.Collections;
 
-public class PlayerController : MonoBehaviour {
-
-    public float playerSpeed;
-    public float sprintSpeed = 4f;
-    public float walkSpeed = 2f;
+[RequireComponent(typeof(Rigidbody))]
+public class PlayerController : MonoBehaviour
+{
+    [Header("Movement Settings")]
+    public float moveSpeed = 5f;
+    public float jumpForce = 5f;
     public float mouseSensitivity = 2f;
-    public float jumpHeight = 3f;
-    private bool isMoving = false;
-    private bool isSprinting =false;
-    private float yRot;
 
-    // private Animator anim;
-    private Rigidbody rigidBody;
+    private Rigidbody rb;
+    private Camera playerCamera;
+    private float yRotation = 0f;
 
-    // Use this for initialization
-    void Start () {
-
-        playerSpeed = walkSpeed;
-        //anim = GetComponent<Animator>();
-        rigidBody = GetComponent<Rigidbody>();
-
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        playerCamera = Camera.main;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
-  
-    // Update is called once per frame
-    void Update () {
 
-        yRot += Input.GetAxis("Mouse X") * mouseSensitivity;
-        transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, yRot, transform.localEulerAngles.z);
+    void Update()
+    {
+        HandleMouseLook();
+        HandleMovement();
+    }
 
-        isMoving = false;
+    void HandleMouseLook()
+    {
+        // Only process horizontal mouse movement
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
 
-        if (Input.GetAxisRaw("Horizontal") > 0.5f || Input.GetAxisRaw("Horizontal") < -0.5f)
+        yRotation += mouseX;
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+
+        // Optionally, reset the camera's local rotation to prevent any vertical tilt
+        playerCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+    }
+
+    void HandleMovement()
+    {
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * moveX + transform.forward * moveZ;
+        move.Normalize();
+
+        Vector3 velocity = move * moveSpeed;
+        velocity.y = rb.velocity.y; // Preserve current vertical velocity
+
+        rb.velocity = velocity;
+
+        if (IsGrounded() && Input.GetButtonDown("Jump"))
         {
-            //transform.Translate(Vector3.right * Input.GetAxis("Horizontal") * playerSpeed);
-            rigidBody.velocity += transform.right * Input.GetAxisRaw("Horizontal") * playerSpeed;
-            isMoving = true;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
-        if (Input.GetAxisRaw("Vertical") > 0.5f || Input.GetAxisRaw("Vertical") < -0.5f)
-        {
-            //transform.Translate(Vector3.forward * Input.GetAxis("Vertical") * playerSpeed);
-            rigidBody.velocity += transform.forward * Input.GetAxisRaw("Vertical") * playerSpeed;
-            isMoving = true;
-        }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+    bool IsGrounded()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1f))
         {
-            transform.Translate(Vector3.up * jumpHeight);
+            return true;
         }
-
-        if (Input.GetAxisRaw("Sprint") > 0f)
-        {
-            playerSpeed = sprintSpeed;
-            isSprinting = true;
-        }else if (Input.GetAxisRaw("Sprint") < 1f)
-        {
-            playerSpeed = walkSpeed;
-            isSprinting = false;
-        }
-        
-        //anim.SetBool("isMoving", isMoving);
-        //anim.SetBool("isSprinting", isSprinting);
-
+        return false;
     }
 }
