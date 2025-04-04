@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 5f;
     public float mouseSensitivity = 2f;
 
+    // This flag controls whether the player can move.
+    public bool canMove = true;
+
     private Rigidbody rb;
     private Camera playerCamera;
     private float yRotation = 0f;
@@ -22,19 +25,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // Only process input if movement is allowed.
+        if (!canMove)
+            return;
+
         HandleMouseLook();
         HandleMovement();
     }
 
     void HandleMouseLook()
     {
-        // Only process horizontal mouse movement
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-
         yRotation += mouseX;
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-
-        // Optionally, reset the camera's local rotation to prevent any vertical tilt
         playerCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
     }
 
@@ -47,7 +50,7 @@ public class PlayerController : MonoBehaviour
         move.Normalize();
 
         Vector3 velocity = move * moveSpeed;
-        velocity.y = rb.velocity.y; // Preserve current vertical velocity
+        velocity.y = rb.velocity.y;
 
         rb.velocity = velocity;
 
@@ -60,10 +63,6 @@ public class PlayerController : MonoBehaviour
     bool IsGrounded()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1f))
-        {
-            return true;
-        }
-        return false;
+        return Physics.Raycast(transform.position, Vector3.down, out hit, 1f);
     }
 }
