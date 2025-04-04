@@ -59,27 +59,30 @@ public class StoryNode : MonoBehaviour
             if (obj != null)
                 obj.SetActive(false);
 
-        // Handle player control
+        // Lock player movement if needed
         if (!allowPlayerMovementDuringNode && playerController != null)
             playerController.canMove = false;
 
         triggered = true;
         Debug.Log($"Story Node '{gameObject.name}' activated.");
 
-        if (nextNode != null)
-        {
-            nextNode.gameObject.SetActive(true);
-            Debug.Log($"Next Story Node '{nextNode.gameObject.name}' activated.");
-        }
-
         if (activeDuration > 0f)
             activeCoroutine = StartCoroutine(DeactivateAfterDuration(activeDuration));
+        else
+            DeactivateNode(); // If duration is 0, deactivate immediately
     }
 
     private IEnumerator DeactivateAfterDuration(float duration)
     {
         yield return new WaitForSeconds(duration);
         DeactivateNode();
+
+        // Activate next node (after delay)
+        if (nextNode != null)
+        {
+            nextNode.gameObject.SetActive(true);
+            Debug.Log($"Next Story Node '{nextNode.gameObject.name}' activated.");
+        }
     }
 
     public void DeactivateNode()
@@ -94,7 +97,7 @@ public class StoryNode : MonoBehaviour
             if (obj != null)
                 obj.SetActive(true);
 
-        // Restore player movement
+        // Restore player movement if it was locked
         if (!allowPlayerMovementDuringNode && playerController != null)
             playerController.canMove = true;
 
