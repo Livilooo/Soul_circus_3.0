@@ -32,7 +32,7 @@ Material:
   m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _RefractionStrength
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -111,8 +111,8 @@ Material:
     - _EnvironmentReflections: 1
     - _FoamAmount: 0.5
     - _FoamCutOff: 1
-    - _FoamScale: 1
-    - _FoamSpeed: 1
+    - _FoamScale: 2
+    - _FoamSpeed: 0.5
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
