@@ -2677,81 +2677,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1189601357959634881, guid: 07c169d061ffac341b2111ce009441d2, type: 3}
   m_PrefabInstance: {fileID: 982470599}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1038949400
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1038949401}
-  - component: {fileID: 1038949403}
-  - component: {fileID: 1038949402}
-  m_Layer: 5
-  m_Name: Bead Holder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1038949401
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1038949400}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.32329768, y: -0.10181089, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1273326811}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -260, y: -140}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1038949402
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1038949400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 2026906752, guid: 8560eb48371903f4ab028ea81e76362d, type: 3}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1038949403
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1038949400}
-  m_CullTransparentMesh: 1
 --- !u!1001 &1053610194
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3472,7 +3397,6 @@ RectTransform:
   m_Children:
   - {fileID: 380600657}
   - {fileID: 1334988984}
-  - {fileID: 1038949401}
   m_Father: {fileID: 1207273938}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3923,14 +3847,14 @@ RectTransform:
   m_GameObject: {fileID: 1334988983}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3205693, y: 0.5187046, z: 0.8702491}
+  m_LocalScale: {x: 0.33191746, y: 0.53706676, z: 0.90105593}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1273326811}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -265, y: 5}
+  m_AnchoredPosition: {x: -265, y: -29}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1334988985
@@ -5468,6 +5392,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1945875874}
   - component: {fileID: 1945875873}
+  - component: {fileID: 1945875875}
   m_Layer: 0
   m_Name: Inventory
   m_TagString: Untagged
@@ -5502,6 +5427,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1945875875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945875872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ddc21beec958f347a49f5c687c02cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryPanel: {fileID: 0}
+  slotPanel: {fileID: 0}
+  inventorySlot: {fileID: 4446069290430242902, guid: 07c169d061ffac341b2111ce009441d2, type: 3}
+  inventoryItem: {fileID: 6265011690875881685, guid: 1f0baed30979d8b45ac7fd48b7fd6dbe, type: 3}
+  slotAmount: 0
+  slots: []
 --- !u!1 &1970426904
 GameObject:
   m_ObjectHideFlags: 0
