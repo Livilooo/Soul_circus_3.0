@@ -33,7 +33,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Blend: 1
+    - _Blend: 0.62074083
     - _Exposure1: 3.93
     - _Exposure2: 0.72
     - _ImageType: 0
