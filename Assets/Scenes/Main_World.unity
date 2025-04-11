@@ -210,7 +210,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 2407a2febb579e14083a1ab5f589ca55, type: 3}
+  m_Texture: {fileID: 2800000, guid: abf215dceabba9d4aa878d62154d55f0, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -404,7 +404,6 @@ MonoBehaviour:
   activeDuration: 2
   waitForUIButton: 1
   continueButton: {fileID: 2096135810}
-  fadeDuration: 1
 --- !u!65 &200603144
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -918,7 +917,6 @@ MonoBehaviour:
   activeDuration: 2
   waitForUIButton: 0
   continueButton: {fileID: 0}
-  fadeDuration: 1
 --- !u!65 &312569647
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -954,38 +952,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2105902961}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &377616874
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 377616877}
-  - component: {fileID: 377616880}
-  m_Layer: 0
-  m_Name: EventManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &377616877
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377616874}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!223 &377616878
@@ -1037,22 +1003,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &377616880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377616874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89e51ba270c12ac4d951e0327935d425, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameEvent: {fileID: 0}
-  Response:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &385485427
 GameObject:
   m_ObjectHideFlags: 0
@@ -1383,7 +1333,6 @@ MonoBehaviour:
   activeDuration: 1
   waitForUIButton: 0
   continueButton: {fileID: 0}
-  fadeDuration: 1
 --- !u!65 &499078806
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2338,7 +2287,6 @@ MonoBehaviour:
   activeDuration: 6
   waitForUIButton: 0
   continueButton: {fileID: 0}
-  fadeDuration: 1
 --- !u!65 &737644649
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2669,7 +2617,6 @@ MonoBehaviour:
   activeDuration: 2
   waitForUIButton: 1
   continueButton: {fileID: 1311273018}
-  fadeDuration: 1
 --- !u!65 &751970992
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2749,7 +2696,6 @@ MonoBehaviour:
   activeDuration: 2
   waitForUIButton: 0
   continueButton: {fileID: 0}
-  fadeDuration: 1
 --- !u!65 &759631875
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4130,7 +4076,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 943ce6a585d6b6c458eccdb4e95fb1aa, type: 3}
+  m_Texture: {fileID: 2800000, guid: b5454c160ec568f4797d34387470db86, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -4219,7 +4165,6 @@ MonoBehaviour:
   activeDuration: 3
   waitForUIButton: 1
   continueButton: {fileID: 502405412}
-  fadeDuration: 1
 --- !u!65 &1493109606
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4300,7 +4245,6 @@ MonoBehaviour:
   activeDuration: 4
   waitForUIButton: 0
   continueButton: {fileID: 0}
-  fadeDuration: 1
 --- !u!65 &1514557740
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4320,7 +4264,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.5, y: 1, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1514557741
 Transform:
@@ -4331,7 +4275,7 @@ Transform:
   m_GameObject: {fileID: 1514557738}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.38097355, z: -0, w: 0.92458594}
-  m_LocalPosition: {x: 27.86, y: 3.64, z: 9.34}
+  m_LocalPosition: {x: 27.486, y: 3.529, z: 10.227}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4425,7 +4369,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: ada202febdc6f0e49a4aa3be17b90d7b, type: 3}
+  m_Texture: {fileID: 2800000, guid: 32aab6ac2736973409704d83baa181b5, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -4516,7 +4460,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 559e5ebc0ff3bd24db3776dce9485208, type: 3}
+  m_Texture: {fileID: 2800000, guid: c3942fc8049cf99419a92c0cc400d806, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -5798,7 +5742,6 @@ SceneRoots:
   - {fileID: 1110223504}
   - {fileID: 667592238}
   - {fileID: 749935444}
-  - {fileID: 377616877}
   - {fileID: 312569648}
   - {fileID: 1993097700}
   - {fileID: 2000803046}
