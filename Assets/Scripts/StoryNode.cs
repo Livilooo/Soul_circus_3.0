@@ -25,8 +25,7 @@ public class StoryNode : MonoBehaviour
     public bool waitForUIButton = false;
     public Button continueButton;
 
-    [Header("Fade Settings")]
-    public float fadeDuration = 1f; // Duration for fade in/out.
+    // Removed Fade Settings
 
     private bool triggered = false;
     private Coroutine activeCoroutine;
@@ -60,12 +59,21 @@ public class StoryNode : MonoBehaviour
 
     public void ActivateNode()
     {
-        // Fade out temporarily disabled objects
+        // Immediately disable temporarily disabled objects.
         foreach (var obj in objectsToDisable)
+        {
             if (obj != null)
-                StartCoroutine(FadeOut(obj, fadeDuration));
+                obj.SetActive(false);
+        }
 
-        // Lock player movement if needed
+        // Immediately disable permanently disabled objects.
+        foreach (var obj in objectsToPermanentlyDisable)
+        {
+            if (obj != null)
+                obj.SetActive(false);
+        }
+
+        // Lock player movement if needed.
         if (!allowPlayerMovementDuringNode && playerController != null)
             playerController.canMove = false;
 
@@ -81,7 +89,7 @@ public class StoryNode : MonoBehaviour
             }
             else
             {
-                // If no duration is set, show the button immediately
+                // If no duration is set, show the button immediately.
                 continueButton.gameObject.SetActive(true);
                 timeElapsed = true;
             }
@@ -93,6 +101,7 @@ public class StoryNode : MonoBehaviour
         else
         {
             DeactivateNode();
+            ActivateNextNode();
         }
     }
 
@@ -117,7 +126,7 @@ public class StoryNode : MonoBehaviour
         Debug.Log("Continue button pressed!");
         if (timeElapsed)
         {
-            // Reactivate player movement here
+            // Reactivate player movement if needed.
             if (!allowPlayerMovementDuringNode && playerController != null)
             {
                 playerController.canMove = true;
@@ -145,24 +154,28 @@ public class StoryNode : MonoBehaviour
 
     public void DeactivateNode()
     {
-        // Fade in story elements
+        // Immediately enable story elements.
         foreach (var element in storyElements)
+        {
             if (element != null)
-                StartCoroutine(FadeIn(element, fadeDuration));
+                element.SetActive(true);
+        }
 
-        // Reactivate temporarily disabled objects
+        // Immediately re-enable temporarily disabled objects.
         foreach (var obj in objectsToDisable)
+        {
             if (obj != null)
-                StartCoroutine(FadeIn(obj, fadeDuration));
+                obj.SetActive(true);
+        }
 
-        // Permanently disable and destroy objects (if triggerOnce is true)
+        // Permanently disable and destroy objects (if triggerOnce is true).
         if (triggerOnce)
         {
             foreach (var obj in objectsToPermanentlyDisable)
             {
                 if (obj != null)
                 {
-                    // Skip destroying the player or its PlayerController script
+                    // Skip destroying the player or any object with a PlayerController.
                     if (obj.CompareTag("Player") || obj.GetComponent<PlayerController>() != null)
                     {
                         Debug.Log($"Skipping destruction of player object: {obj.name}");
@@ -174,13 +187,13 @@ public class StoryNode : MonoBehaviour
                 }
             }
 
-            // Destroy this StoryNode
+            // Destroy this StoryNode.
             Debug.Log($"Destroying Story Node: {gameObject.name}");
             Destroy(gameObject);
         }
         else
         {
-            // Ensure player movement is enabled if the StoryNode is not destroyed
+            // Ensure player movement is enabled if the StoryNode is not destroyed.
             if (!allowPlayerMovementDuringNode && playerController != null)
             {
                 playerController.canMove = true;
@@ -192,81 +205,16 @@ public class StoryNode : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Ensure player movement is re-enabled when the node is destroyed
+        // Ensure player movement is re-enabled when the node is destroyed.
         if (playerController != null && !allowPlayerMovementDuringNode)
         {
             playerController.canMove = true;
         }
 
-        // Clean up button listener
+        // Clean up button listener.
         if (continueButton != null)
         {
             continueButton.onClick.RemoveListener(OnContinueButtonPressed);
-        }
-    }
-
-    private IEnumerator FadeOut(GameObject obj, float duration)
-    {
-        var renderer = obj.GetComponent<Renderer>();
-        var canvasGroup = obj.GetComponent<CanvasGroup>();
-        float elapsedTime = 0f;
-
-        if (renderer != null)
-        {
-            var material = renderer.material;
-            Color startColor = material.color;
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float alpha = Mathf.Lerp(1f, 0f, elapsedTime / duration);
-                material.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-                yield return null;
-            }
-            material.color = new Color(startColor.r, startColor.g, startColor.b, 0f);
-        }
-        else if (canvasGroup != null)
-        {
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsedTime / duration);
-                yield return null;
-            }
-            canvasGroup.alpha = 0f;
-        }
-
-        obj.SetActive(false);
-    }
-
-    private IEnumerator FadeIn(GameObject obj, float duration)
-    {
-        obj.SetActive(true);
-        var renderer = obj.GetComponent<Renderer>();
-        var canvasGroup = obj.GetComponent<CanvasGroup>();
-        float elapsedTime = 0f;
-
-        if (renderer != null)
-        {
-            var material = renderer.material;
-            Color startColor = material.color;
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float alpha = Mathf.Lerp(0f, 1f, elapsedTime / duration);
-                material.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-                yield return null;
-            }
-            material.color = new Color(startColor.r, startColor.g, startColor.b, 1f);
-        }
-        else if (canvasGroup != null)
-        {
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / duration);
-                yield return null;
-            }
-            canvasGroup.alpha = 1f;
         }
     }
 }
