@@ -1,22 +1,35 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+#region Serializable Surrogates for Save Data
+
+[System.Serializable]
+public class SerializableKeyValuePair
+{
+    public string key;
+    public float value;
+}
 
 [System.Serializable]
 public class NodeSaveData
 {
     public string nodeId;
     public bool hasBeenTriggered;
-    public Dictionary<string, float> variables;
+    public List<SerializableKeyValuePair> variables;
 
     public NodeSaveData(string id)
     {
         nodeId = id;
         hasBeenTriggered = false;
-        variables = new Dictionary<string, float>();
+        variables = new List<SerializableKeyValuePair>();
     }
 }
+
+#endregion
+
+#region Additional Classes
 
 [System.Serializable]
 public class BranchingChoice
@@ -38,15 +51,18 @@ public class CameraPoint
     public AnimationCurve transitionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 }
 
+#endregion
+
 public class StoryNode : MonoBehaviour
 {
-    #region Variables
-    [Header("Debug")]
+    #region Variables & Settings
+
+    [Header("Debug Settings")]
     [SerializeField] private bool showDebugLogs = true;
     private bool isProcessing = false;
 
     [Header("Identification")]
-    [SerializeField] private string nodeId = System.Guid.NewGuid().ToString();
+    [SerializeField] private string nodeId = "";
 
     [Header("Story Elements to Activate")]
     public GameObject[] storyElements;
@@ -60,15 +76,20 @@ public class StoryNode : MonoBehaviour
     [Header("Player Control Settings")]
     public bool allowPlayerMovementDuringNode = true;
     private bool wasPlayerMovementEnabled = true;
+    private PlayerController playerController;
 
     [Header("Camera Settings")]
     public CameraPoint[] cameraPoints;
     public bool returnCameraToPlayer = true;
+    private Camera mainCamera;
+    private Transform originalCameraParent;
+    private Vector3 originalCameraPosition;
+    private Quaternion originalCameraRotation;
 
     [Header("Chained Story Node (Optional)")]
     public StoryNode nextNode;
 
-    [Header("Settings")]
+    [Header("General Node Settings")]
     public bool triggerOnce = true;
     public float activeDuration = 5f;
     public bool waitForUIButton = false;
@@ -81,18 +102,20 @@ public class StoryNode : MonoBehaviour
     public UnityEngine.Events.UnityEvent onNodeActivate;
     public UnityEngine.Events.UnityEvent onNodeDeactivate;
 
+    // New Dev Mode setting: when true, the node won't save its state.
+    [Header("Development Settings")]
+    [Tooltip("Enable dev mode to prevent saving/loading node state.")]
+    public bool devMode = false;
+
     private bool triggered = false;
     private Coroutine activeCoroutine;
-    private PlayerController playerController;
     private bool timeElapsed = false;
     private Dictionary<string, float> variables = new Dictionary<string, float>();
-    private Camera mainCamera;
-    private Transform originalCameraParent;
-    private Vector3 originalCameraPosition;
-    private Quaternion originalCameraRotation;
+
     #endregion
 
-    #region Unity Lifecycle Methods
+    #region Unity Lifecycle
+
     private void Awake()
     {
         if (string.IsNullOrEmpty(nodeId))
@@ -159,6 +182,7 @@ public class StoryNode : MonoBehaviour
         if (other == null || !other.CompareTag("Player"))
             return;
 
+        // Only trigger if the node is allowed to trigger (based on triggerOnce and saved state)
         if (triggered && triggerOnce)
             return;
 
@@ -186,136 +210,11 @@ public class StoryNode : MonoBehaviour
             Debug.LogError($"[StoryNode] Error during cleanup: {e.Message}");
         }
     }
+
     #endregion
 
-    #region Public Methods
-    public void ActivateNode()
-    {
-        if (isProcessing)
-        {
-            DebugLog("Node already processing, ignoring activation request.");
-            return;
-        }
+    #region Node Initialization and Cleanup
 
-        isProcessing = true;
-        try
-        {
-            DebugLog($"Starting node activation for {gameObject.name}");
-            StopAllCoroutines();
-
-            // Store initial player state and set movement
-            if (playerController != null)
-            {
-                wasPlayerMovementEnabled = playerController.canMove;
-                playerController.canMove = allowPlayerMovementDuringNode;
-                DebugLog($"Set player movement to {allowPlayerMovementDuringNode}");
-            }
-
-            // Immediately activate story elements first
-            foreach (var element in storyElements)
-            {
-                if (element != null)
-                {
-                    element.SetActive(true);
-                    DebugLog($"Activated story element: {element.name}");
-                }
-            }
-
-            // Then handle disabling objects
-            DisableObjects();
-
-            triggered = true;
-            timeElapsed = false;
-
-            StartCoroutine(ProcessNodeSequence());
-            onNodeActivate?.Invoke();
-            SaveNodeState();
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[StoryNode] Error in ActivateNode: {e.Message}\n{e.StackTrace}");
-            RestorePlayerState();
-        }
-        finally
-        {
-            isProcessing = false;
-        }
-    }
-
-    public void OnContinueButtonPressed()
-    {
-        if (!isActiveAndEnabled || !triggered || !timeElapsed)
-        {
-            DebugLog($"Invalid continue button press state - Active: {isActiveAndEnabled}, Triggered: {triggered}, TimeElapsed: {timeElapsed}");
-            return;
-        }
-
-        try
-        {
-            DebugLog("Continue button pressed!");
-            if (continueButton != null)
-            {
-                continueButton.gameObject.SetActive(false);
-            }
-
-            DeactivateNode();
-            ActivateNextNode();
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[StoryNode] Error in OnContinueButtonPressed: {e.Message}");
-            RestorePlayerState();
-        }
-    }
-
-    public void ForceReset()
-    {
-        try
-        {
-            StopAllCoroutines();
-            triggered = false;
-            timeElapsed = false;
-            variables.Clear();
-
-            RestorePlayerState();
-            ResetObjects();
-            ResetCamera();
-            SaveNodeState();
-
-            DebugLog($"Force reset completed for {gameObject.name}");
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"[StoryNode] Error in ForceReset: {e.Message}");
-        }
-    }
-
-    public void SetVariable(string name, float value)
-    {
-        if (string.IsNullOrEmpty(name))
-        {
-            Debug.LogError("[StoryNode] Attempted to set variable with null or empty name");
-            return;
-        }
-
-        variables[name] = value;
-        SaveNodeState();
-        DebugLog($"Set variable {name} to {value}");
-    }
-
-    public float GetVariable(string name, float defaultValue = 0f)
-    {
-        if (string.IsNullOrEmpty(name))
-        {
-            Debug.LogError("[StoryNode] Attempted to get variable with null or empty name");
-            return defaultValue;
-        }
-
-        return variables.TryGetValue(name, out float value) ? value : defaultValue;
-    }
-    #endregion
-
-    #region Private Methods
     private void InitializeNode()
     {
         if (continueButton != null)
@@ -343,57 +242,67 @@ public class StoryNode : MonoBehaviour
         ResetCamera();
     }
 
-    private void DisableObjects()
+    #endregion
+
+    #region Node Activation & Processing
+
+    public void ActivateNode()
     {
-        foreach (var obj in objectsToDisable)
+        if (isProcessing)
         {
-            if (obj != null)
-            {
-                obj.SetActive(false);
-                DebugLog($"Temporarily disabled: {obj.name}");
-            }
+            DebugLog("Node already processing, ignoring activation request.");
+            return;
         }
 
-        foreach (var obj in objectsToPermanentlyDisable)
+        isProcessing = true;
+        try
         {
-            if (obj != null)
-            {
-                obj.SetActive(false);
-                DebugLog($"Permanently disabled: {obj.name}");
-            }
-        }
-    }
+            DebugLog($"Activating node: {gameObject.name}");
+            StopAllCoroutines();
 
-    private void ResetObjects()
-    {
-        foreach (var obj in objectsToDisable)
-        {
-            if (obj != null)
+            if (playerController != null)
             {
-                obj.SetActive(true);
-                DebugLog($"Reset object: {obj.name}");
+                wasPlayerMovementEnabled = playerController.canMove;
+                playerController.canMove = allowPlayerMovementDuringNode;
+                DebugLog($"Player movement set to: {allowPlayerMovementDuringNode}");
             }
-        }
-    }
 
-    private void RestorePlayerState()
-    {
-        if (playerController != null)
+            foreach (var element in storyElements)
+            {
+                if (element != null)
+                {
+                    element.SetActive(true);
+                    DebugLog($"Activated story element: {element.name}");
+                }
+            }
+
+            DisableObjects();
+
+            triggered = true;
+            timeElapsed = false;
+            onNodeActivate?.Invoke();
+            SaveNodeState();
+
+            activeCoroutine = StartCoroutine(ProcessNodeSequence());
+        }
+        catch (System.Exception e)
         {
-            playerController.canMove = wasPlayerMovementEnabled;
-            DebugLog($"Restored player movement to: {wasPlayerMovementEnabled}");
+            Debug.LogError($"[StoryNode] Error in ActivateNode: {e.Message}\n{e.StackTrace}");
+            RestorePlayerState();
+        }
+        finally
+        {
+            isProcessing = false;
         }
     }
 
     private IEnumerator ProcessNodeSequence()
     {
-        // Handle camera sequence if present
         if (cameraPoints != null && cameraPoints.Length > 0)
         {
             yield return StartCoroutine(ProcessCameraPoints());
         }
 
-        // Handle timing and UI
         if (waitForUIButton && continueButton != null)
         {
             if (activeDuration > 0f)
@@ -438,10 +347,8 @@ public class StoryNode : MonoBehaviour
             {
                 elapsed += Time.deltaTime;
                 float t = point.transitionCurve.Evaluate(elapsed / point.transitionDuration);
-
                 mainCamera.transform.position = Vector3.Lerp(startPos, point.point.position, t);
                 mainCamera.transform.rotation = Quaternion.Lerp(startRot, point.point.rotation, t);
-
                 yield return null;
             }
         }
@@ -449,36 +356,19 @@ public class StoryNode : MonoBehaviour
         if (returnCameraToPlayer)
         {
             float returnDuration = 1f;
-            float elapsed = 0f;
+            float elapsedReturn = 0f;
             Vector3 startPos = mainCamera.transform.position;
             Quaternion startRot = mainCamera.transform.rotation;
-
-            while (elapsed < returnDuration)
+            while (elapsedReturn < returnDuration)
             {
-                elapsed += Time.deltaTime;
-                float t = elapsed / returnDuration;
-
+                elapsedReturn += Time.deltaTime;
+                float t = elapsedReturn / returnDuration;
                 mainCamera.transform.position = Vector3.Lerp(startPos, originalPosition, t);
                 mainCamera.transform.rotation = Quaternion.Lerp(startRot, originalRotation, t);
-
                 yield return null;
             }
-
             mainCamera.transform.position = originalPosition;
             mainCamera.transform.rotation = originalRotation;
-        }
-    }
-
-    private void ResetCamera()
-    {
-        if (mainCamera != null)
-        {
-            if (originalCameraParent != null)
-            {
-                mainCamera.transform.SetParent(originalCameraParent);
-            }
-            mainCamera.transform.localPosition = originalCameraPosition;
-            mainCamera.transform.localRotation = originalCameraRotation;
         }
     }
 
@@ -497,7 +387,7 @@ public class StoryNode : MonoBehaviour
         if (waitForUIButton && continueButton != null)
         {
             continueButton.gameObject.SetActive(true);
-            DebugLog("Activated continue button after duration");
+            DebugLog("Continue button enabled after duration");
         }
         else
         {
@@ -506,19 +396,47 @@ public class StoryNode : MonoBehaviour
         }
     }
 
-    private void ActivateNextNode()
+    public void OnContinueButtonPressed()
     {
-        if (nextNode != null)
+        if (!isActiveAndEnabled || !triggered || !timeElapsed)
         {
-            DebugLog($"Preparing to activate next node: {nextNode.gameObject.name}");
-            nextNode.gameObject.SetActive(true);
-            nextNode.ActivateNode();
+            DebugLog($"Invalid continue button press state - Active: {isActiveAndEnabled}, Triggered: {triggered}, TimeElapsed: {timeElapsed}");
+            return;
         }
-        else
+
+        DebugLog("Continue button pressed!");
+        if (continueButton != null)
         {
-            DebugLog("No next node to activate");
+            continueButton.gameObject.SetActive(false);
+        }
+
+        DeactivateNode();
+        ActivateNextNode();
+    }
+
+    public void ForceReset()
+    {
+        try
+        {
+            StopAllCoroutines();
+            triggered = false;
+            timeElapsed = false;
+            variables.Clear();
+            RestorePlayerState();
+            ResetObjects();
+            ResetCamera();
+            SaveNodeState();
+            DebugLog("Force reset completed");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[StoryNode] Error in ForceReset: {e.Message}");
         }
     }
+
+    #endregion
+
+    #region Node Deactivation & Chaining
 
     private void DeactivateNode()
     {
@@ -529,7 +447,7 @@ public class StoryNode : MonoBehaviour
             foreach (var element in storyElements)
             {
                 if (element != null)
-                    element.SetActive(true);
+                    element.SetActive(false);
             }
 
             ResetObjects();
@@ -544,17 +462,20 @@ public class StoryNode : MonoBehaviour
                         DebugLog($"Destroyed permanent object: {obj.name}");
                     }
                 }
+            }
 
-                SaveNodeState();
-                onNodeDeactivate?.Invoke();
-                Destroy(gameObject);
-                DebugLog("Node destroyed (triggerOnce)");
+            SaveNodeState();
+            onNodeDeactivate?.Invoke();
+
+            if (triggerOnce)
+            {
+                gameObject.SetActive(false);
+                DebugLog("Node has been deactivated and set inactive (triggerOnce).");
             }
             else
             {
                 RestorePlayerState();
-                onNodeDeactivate?.Invoke();
-                DebugLog("Node deactivated (repeatable)");
+                DebugLog("Node deactivated (repeatable).");
             }
         }
         catch (System.Exception e)
@@ -564,15 +485,103 @@ public class StoryNode : MonoBehaviour
         }
     }
 
+    private void ActivateNextNode()
+    {
+        if (nextNode != null)
+        {
+            DebugLog($"Activating chained node: {nextNode.gameObject.name}");
+            nextNode.gameObject.SetActive(true);
+            nextNode.ActivateNode();
+        }
+        else
+        {
+            DebugLog("No next node to activate");
+        }
+    }
+
+    #endregion
+
+    #region Object & Camera Helpers
+
+    private void DisableObjects()
+    {
+        foreach (var obj in objectsToDisable)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(false);
+                DebugLog($"Temporarily disabled: {obj.name}");
+            }
+        }
+        foreach (var obj in objectsToPermanentlyDisable)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(false);
+                DebugLog($"Permanently disabled: {obj.name}");
+            }
+        }
+    }
+
+    private void ResetObjects()
+    {
+        foreach (var obj in objectsToDisable)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(true);
+                DebugLog($"Reset object: {obj.name}");
+            }
+        }
+    }
+
+    private void RestorePlayerState()
+    {
+        if (playerController != null)
+        {
+            playerController.canMove = wasPlayerMovementEnabled;
+            DebugLog($"Restored player movement to: {wasPlayerMovementEnabled}");
+        }
+    }
+
+    private void ResetCamera()
+    {
+        if (mainCamera != null)
+        {
+            if (originalCameraParent != null)
+            {
+                mainCamera.transform.SetParent(originalCameraParent);
+            }
+            mainCamera.transform.localPosition = originalCameraPosition;
+            mainCamera.transform.localRotation = originalCameraRotation;
+        }
+    }
+
+    #endregion
+
+    #region Save/Load Node State
+
     private void SaveNodeState()
     {
+        // Only save if not in dev mode.
+        if (devMode)
+        {
+            DebugLog("Dev mode enabled - skipping save.");
+            return;
+        }
+
         try
         {
             NodeSaveData saveData = new NodeSaveData(nodeId)
             {
                 hasBeenTriggered = triggered,
-                variables = new Dictionary<string, float>(variables)
+                variables = new List<SerializableKeyValuePair>()
             };
+
+            foreach (var kvp in variables)
+            {
+                saveData.variables.Add(new SerializableKeyValuePair { key = kvp.Key, value = kvp.Value });
+            }
 
             string json = JsonUtility.ToJson(saveData);
             PlayerPrefs.SetString($"StoryNode_{nodeId}", json);
@@ -587,6 +596,13 @@ public class StoryNode : MonoBehaviour
 
     private void LoadNodeState()
     {
+        // Only load if not in dev mode.
+        if (devMode)
+        {
+            DebugLog("Dev mode enabled - skipping load.");
+            return;
+        }
+
         try
         {
             string json = PlayerPrefs.GetString($"StoryNode_{nodeId}", "");
@@ -596,7 +612,11 @@ public class StoryNode : MonoBehaviour
                 if (saveData != null)
                 {
                     triggered = saveData.hasBeenTriggered;
-                    variables = new Dictionary<string, float>(saveData.variables);
+                    variables = new Dictionary<string, float>();
+                    foreach (var kvp in saveData.variables)
+                    {
+                        variables[kvp.key] = kvp.value;
+                    }
                     DebugLog("Node state loaded");
                 }
             }
@@ -607,12 +627,39 @@ public class StoryNode : MonoBehaviour
         }
     }
 
+    #endregion
+
     private void DebugLog(string message)
     {
         if (showDebugLogs)
         {
-            Debug.Log($"[StoryNode] {gameObject.name}: {message}");
+            Debug.Log($"[StoryNode - {gameObject.name}] {message}");
         }
     }
+
+    #region Variable Get/Set Methods
+
+    public void SetVariable(string name, float value)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            Debug.LogError("[StoryNode] Attempted to set variable with null or empty name");
+            return;
+        }
+        variables[name] = value;
+        SaveNodeState();
+        DebugLog($"Set variable {name} to {value}");
+    }
+
+    public float GetVariable(string name, float defaultValue = 0f)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            Debug.LogError("[StoryNode] Attempted to get variable with null or empty name");
+            return defaultValue;
+        }
+        return variables.TryGetValue(name, out float value) ? value : defaultValue;
+    }
+
     #endregion
 }
