@@ -102,9 +102,9 @@ public class StoryNode : MonoBehaviour
     public UnityEngine.Events.UnityEvent onNodeActivate;
     public UnityEngine.Events.UnityEvent onNodeDeactivate;
 
-    // New Dev Mode setting: when true, the node won't save its state.
+    // Use the context menu below to clear save data on this node.
     [Header("Development Settings")]
-    [Tooltip("Enable dev mode to prevent saving/loading node state.")]
+    [Tooltip("Right-click on the component (gear icon) and choose Clear Save Data to reset this node.")]
     public bool devMode = false;
 
     private bool triggered = false;
@@ -182,7 +182,7 @@ public class StoryNode : MonoBehaviour
         if (other == null || !other.CompareTag("Player"))
             return;
 
-        // Only trigger if the node is allowed to trigger (based on triggerOnce and saved state)
+        // Only trigger if the node is allowed to trigger (skip if already triggered and triggerOnce is true)
         if (triggered && triggerOnce)
             return;
 
@@ -223,7 +223,12 @@ public class StoryNode : MonoBehaviour
             continueButton.onClick.AddListener(OnContinueButtonPressed);
         }
 
-        LoadNodeState();
+        // Load saved state (unless devMode is on, in which case we start fresh)
+        if (!devMode)
+        {
+            LoadNodeState();
+        }
+
         DebugLog($"Initialized node: {gameObject.name}");
     }
 
@@ -322,7 +327,7 @@ public class StoryNode : MonoBehaviour
         else
         {
             DeactivateNode();
-            ActivateNextNode();
+            yield return StartCoroutine(CompleteNodeSequence());
         }
     }
 
@@ -374,12 +379,6 @@ public class StoryNode : MonoBehaviour
 
     private IEnumerator DeactivateAfterDuration(float duration)
     {
-        if (duration < 0)
-        {
-            DebugLog($"Invalid duration ({duration}), skipping wait");
-            yield break;
-        }
-
         DebugLog($"Waiting for {duration} seconds");
         yield return new WaitForSeconds(duration);
         timeElapsed = true;
@@ -392,8 +391,21 @@ public class StoryNode : MonoBehaviour
         else
         {
             DeactivateNode();
-            ActivateNextNode();
+            yield return StartCoroutine(CompleteNodeSequence());
         }
+    }
+
+    // Coroutine to ensure the next node is activated after deactivation is complete.
+    private IEnumerator CompleteNodeSequence()
+    {
+        // Wait one frame to guarantee all deactivation logic is complete.
+        yield return new WaitForEndOfFrame();
+#if UNITY_EDITOR
+        // Ensure the Editor isn't paused.
+        if (UnityEditor.EditorApplication.isPaused)
+            UnityEditor.EditorApplication.isPaused = false;
+#endif
+        ActivateNextNode();
     }
 
     public void OnContinueButtonPressed()
@@ -411,7 +423,7 @@ public class StoryNode : MonoBehaviour
         }
 
         DeactivateNode();
-        ActivateNextNode();
+        StartCoroutine(CompleteNodeSequence());
     }
 
     public void ForceReset()
@@ -452,6 +464,9 @@ public class StoryNode : MonoBehaviour
 
             ResetObjects();
 
+            // Restore player's movement state.
+            RestorePlayerState();
+
             if (triggerOnce)
             {
                 foreach (var obj in objectsToPermanentlyDisable)
@@ -474,7 +489,6 @@ public class StoryNode : MonoBehaviour
             }
             else
             {
-                RestorePlayerState();
                 DebugLog("Node deactivated (repeatable).");
             }
         }
@@ -563,7 +577,7 @@ public class StoryNode : MonoBehaviour
 
     private void SaveNodeState()
     {
-        // Only save if not in dev mode.
+        // Skip saving if in dev mode.
         if (devMode)
         {
             DebugLog("Dev mode enabled - skipping save.");
@@ -596,10 +610,13 @@ public class StoryNode : MonoBehaviour
 
     private void LoadNodeState()
     {
-        // Only load if not in dev mode.
+        // Skip loading if in dev mode; start fresh.
         if (devMode)
         {
-            DebugLog("Dev mode enabled - skipping load.");
+            DebugLog("Dev mode enabled - skipping load and clearing saved state.");
+            PlayerPrefs.DeleteKey($"StoryNode_{nodeId}");
+            triggered = false;
+            variables = new Dictionary<string, float>();
             return;
         }
 
@@ -659,6 +676,19 @@ public class StoryNode : MonoBehaviour
             return defaultValue;
         }
         return variables.TryGetValue(name, out float value) ? value : defaultValue;
+    }
+
+    #endregion
+
+    #region Context Menu for Clearing Save Data
+
+    [ContextMenu("Clear Save Data")]
+    public void ClearSaveData()
+    {
+        PlayerPrefs.DeleteKey($"StoryNode_{nodeId}");
+        triggered = false;
+        variables = new Dictionary<string, float>();
+        DebugLog("Save data cleared.");
     }
 
     #endregion
