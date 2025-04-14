@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 6dbe7493cf581034a86672a9197acfc3, type: 2}
@@ -35,7 +35,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 5
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 452329224}
   m_UseRadianceAmbientProbe: 0
@@ -626,6 +626,11 @@ Transform:
   - {fileID: 1989935180}
   - {fileID: 1958591275}
   - {fileID: 2012772541}
+  - {fileID: 793545308}
+  - {fileID: 896120256}
+  - {fileID: 1494398129}
+  - {fileID: 2006444343}
+  - {fileID: 917670989}
   - {fileID: 312569648}
   m_Father: {fileID: 1019548384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1222,7 +1227,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!114 &452329223
 MonoBehaviour:
@@ -1318,7 +1323,7 @@ Transform:
   m_GameObject: {fileID: 452329222}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 200, z: 0}
+  m_LocalPosition: {x: 0, y: 300, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2558,6 +2563,96 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 866649441}
   m_SourcePrefab: {fileID: 100100000, guid: 3c1c69d65da566d42bf49a968a50d876, type: 3}
+--- !u!1 &793545307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 793545308}
+  - component: {fileID: 793545310}
+  - component: {fileID: 793545309}
+  m_Layer: 0
+  m_Name: Meet_Mushu_2 (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &793545308
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793545307}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
+  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 239002968}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
+--- !u!114 &793545309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793545307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showDebugLogs: 1
+  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
+  storyElements:
+  - {fileID: 1746447440}
+  - {fileID: 2000803042}
+  objectsToDisable:
+  - {fileID: 1993097698}
+  objectsToPermanentlyDisable: []
+  allowPlayerMovementDuringNode: 0
+  cameraPoints: []
+  returnCameraToPlayer: 0
+  nextNode: {fileID: 0}
+  triggerOnce: 1
+  activeDuration: 3
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
+  choices: []
+  onNodeActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  devMode: 0
+--- !u!65 &793545310
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793545307}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &812101011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2723,6 +2818,183 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &896120255
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896120256}
+  - component: {fileID: 896120258}
+  - component: {fileID: 896120257}
+  m_Layer: 0
+  m_Name: Meet_Mushu_2 (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &896120256
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896120255}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
+  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 239002968}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
+--- !u!114 &896120257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896120255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showDebugLogs: 1
+  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
+  storyElements:
+  - {fileID: 86441080}
+  - {fileID: 1309199564}
+  objectsToDisable:
+  - {fileID: 1993097698}
+  objectsToPermanentlyDisable: []
+  allowPlayerMovementDuringNode: 0
+  cameraPoints: []
+  returnCameraToPlayer: 0
+  nextNode: {fileID: 0}
+  triggerOnce: 1
+  activeDuration: 3
+  waitForUIButton: 1
+  continueButton: {fileID: 1273384419}
+  choices: []
+  onNodeActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  devMode: 0
+--- !u!65 &896120258
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896120255}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &917670988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 917670989}
+  - component: {fileID: 917670991}
+  - component: {fileID: 917670990}
+  m_Layer: 0
+  m_Name: Meet_Mushu_2 (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &917670989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917670988}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
+  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 239002968}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
+--- !u!114 &917670990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917670988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showDebugLogs: 1
+  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
+  storyElements: []
+  objectsToDisable: []
+  objectsToPermanentlyDisable: []
+  allowPlayerMovementDuringNode: 0
+  cameraPoints: []
+  returnCameraToPlayer: 1
+  nextNode: {fileID: 0}
+  triggerOnce: 1
+  activeDuration: 3
+  waitForUIButton: 1
+  continueButton: {fileID: 2096135810}
+  choices: []
+  onNodeActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  devMode: 0
+--- !u!65 &917670991
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917670988}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1019548383
 GameObject:
   m_ObjectHideFlags: 0
@@ -4085,6 +4357,96 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeDuration: 2
+--- !u!1 &1494398128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1494398129}
+  - component: {fileID: 1494398131}
+  - component: {fileID: 1494398130}
+  m_Layer: 0
+  m_Name: Meet_Mushu_2 (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1494398129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494398128}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
+  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 239002968}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
+--- !u!114 &1494398130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494398128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showDebugLogs: 1
+  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
+  storyElements:
+  - {fileID: 1664819562}
+  - {fileID: 2000803042}
+  objectsToDisable:
+  - {fileID: 1993097698}
+  objectsToPermanentlyDisable: []
+  allowPlayerMovementDuringNode: 0
+  cameraPoints: []
+  returnCameraToPlayer: 0
+  nextNode: {fileID: 0}
+  triggerOnce: 1
+  activeDuration: 3
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
+  choices: []
+  onNodeActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  devMode: 0
+--- !u!65 &1494398131
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494398128}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1594068144
 GameObject:
   m_ObjectHideFlags: 0
@@ -4242,6 +4604,50 @@ Transform:
   - {fileID: 1979899502}
   - {fileID: 47954349}
   m_Father: {fileID: 732606120}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1688323660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1688323662}
+  - component: {fileID: 1688323661}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1688323661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688323660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f490fe0e242c7448243b5ff0418206, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1688323662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688323660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1746447440
 GameObject:
@@ -5644,6 +6050,96 @@ Transform:
   - {fileID: 307356639}
   m_Father: {fileID: 1468739293}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2006444342
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2006444343}
+  - component: {fileID: 2006444345}
+  - component: {fileID: 2006444344}
+  m_Layer: 0
+  m_Name: Meet_Mushu_2 (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2006444343
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006444342}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
+  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 239002968}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
+--- !u!114 &2006444344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006444342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showDebugLogs: 1
+  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
+  storyElements:
+  - {fileID: 1400844901}
+  - {fileID: 1309199564}
+  objectsToDisable:
+  - {fileID: 1993097698}
+  objectsToPermanentlyDisable: []
+  allowPlayerMovementDuringNode: 0
+  cameraPoints: []
+  returnCameraToPlayer: 0
+  nextNode: {fileID: 0}
+  triggerOnce: 1
+  activeDuration: 3
+  waitForUIButton: 1
+  continueButton: {fileID: 2096135810}
+  choices: []
+  onNodeActivate:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+  devMode: 0
+--- !u!65 &2006444345
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006444342}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2012772540
 GameObject:
   m_ObjectHideFlags: 0
@@ -6104,3 +6600,4 @@ SceneRoots:
   - {fileID: 1019548384}
   - {fileID: 1468739293}
   - {fileID: 812101012}
+  - {fileID: 1688323662}

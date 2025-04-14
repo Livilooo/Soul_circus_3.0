@@ -59,7 +59,7 @@ public class StoryNode : MonoBehaviour
 
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugLogs = true;
-    private bool isProcessing = false;
+    private bool isProcessing = false; // true while node processing
 
     [Header("Identification")]
     [SerializeField] private string nodeId = "";
@@ -102,13 +102,12 @@ public class StoryNode : MonoBehaviour
     public UnityEngine.Events.UnityEvent onNodeActivate;
     public UnityEngine.Events.UnityEvent onNodeDeactivate;
 
-    // Use the context menu below to clear save data on this node.
     [Header("Development Settings")]
     [Tooltip("Right-click on the component (gear icon) and choose Clear Save Data to reset this node.")]
     public bool devMode = false;
 
     private bool triggered = false;
-    private Coroutine activeCoroutine;
+    private Coroutine activeCoroutine; // our processing coroutine
     private bool timeElapsed = false;
     private Dictionary<string, float> variables = new Dictionary<string, float>();
 
@@ -123,7 +122,6 @@ public class StoryNode : MonoBehaviour
             nodeId = System.Guid.NewGuid().ToString();
             DebugLog($"Generated new ID for node: {nodeId}");
         }
-
         mainCamera = Camera.main;
         if (mainCamera != null)
         {
@@ -145,7 +143,6 @@ public class StoryNode : MonoBehaviour
             Debug.LogWarning($"[StoryNode] Invalid duration in {gameObject.name}. Setting to 0.");
             activeDuration = 0;
         }
-
         if (string.IsNullOrEmpty(nodeId))
         {
             nodeId = System.Guid.NewGuid().ToString();
@@ -156,13 +153,11 @@ public class StoryNode : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 1f);
-
         if (nextNode != null)
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, nextNode.transform.position);
         }
-
         if (cameraPoints != null && cameraPoints.Length > 0)
         {
             Gizmos.color = Color.blue;
@@ -181,18 +176,15 @@ public class StoryNode : MonoBehaviour
     {
         if (other == null || !other.CompareTag("Player"))
             return;
-
-        // Only trigger if the node is allowed to trigger (skip if already triggered and triggerOnce is true)
+        // If triggerOnce and already triggered, don't proceed.
         if (triggered && triggerOnce)
             return;
-
         playerController = other.GetComponent<PlayerController>();
         if (playerController == null)
         {
             Debug.LogError($"[StoryNode] PlayerController not found on {other.name}");
             return;
         }
-
         wasPlayerMovementEnabled = playerController.canMove;
         ActivateNode();
     }
@@ -222,13 +214,10 @@ public class StoryNode : MonoBehaviour
             continueButton.gameObject.SetActive(false);
             continueButton.onClick.AddListener(OnContinueButtonPressed);
         }
-
-        // Load saved state (unless devMode is on, in which case we start fresh)
         if (!devMode)
         {
             LoadNodeState();
         }
-
         DebugLog($"Initialized node: {gameObject.name}");
     }
 
@@ -238,12 +227,10 @@ public class StoryNode : MonoBehaviour
         {
             continueButton.onClick.RemoveListener(OnContinueButtonPressed);
         }
-
         if (activeCoroutine != null)
         {
             StopCoroutine(activeCoroutine);
         }
-
         ResetCamera();
     }
 
@@ -258,20 +245,21 @@ public class StoryNode : MonoBehaviour
             DebugLog("Node already processing, ignoring activation request.");
             return;
         }
-
         isProcessing = true;
         try
         {
             DebugLog($"Activating node: {gameObject.name}");
-            StopAllCoroutines();
-
+            // Stop only our processing coroutine.
+            if (activeCoroutine != null)
+            {
+                StopCoroutine(activeCoroutine);
+            }
             if (playerController != null)
             {
                 wasPlayerMovementEnabled = playerController.canMove;
                 playerController.canMove = allowPlayerMovementDuringNode;
                 DebugLog($"Player movement set to: {allowPlayerMovementDuringNode}");
             }
-
             foreach (var element in storyElements)
             {
                 if (element != null)
@@ -280,23 +268,17 @@ public class StoryNode : MonoBehaviour
                     DebugLog($"Activated story element: {element.name}");
                 }
             }
-
             DisableObjects();
-
             triggered = true;
             timeElapsed = false;
             onNodeActivate?.Invoke();
             SaveNodeState();
-
             activeCoroutine = StartCoroutine(ProcessNodeSequence());
         }
         catch (System.Exception e)
         {
             Debug.LogError($"[StoryNode] Error in ActivateNode: {e.Message}\n{e.StackTrace}");
             RestorePlayerState();
-        }
-        finally
-        {
             isProcessing = false;
         }
     }
@@ -307,7 +289,6 @@ public class StoryNode : MonoBehaviour
         {
             yield return StartCoroutine(ProcessCameraPoints());
         }
-
         if (waitForUIButton && continueButton != null)
         {
             if (activeDuration > 0f)
@@ -326,28 +307,27 @@ public class StoryNode : MonoBehaviour
         }
         else
         {
+            // Instead of deactivating then chaining,
+            // first start chaining then deactivate.
+            ActivateNextNode();
             DeactivateNode();
-            yield return StartCoroutine(CompleteNodeSequence());
         }
+        isProcessing = false;
     }
 
     private IEnumerator ProcessCameraPoints()
     {
         if (mainCamera == null || cameraPoints == null || cameraPoints.Length == 0)
             yield break;
-
         Vector3 originalPosition = mainCamera.transform.position;
         Quaternion originalRotation = mainCamera.transform.rotation;
-
         foreach (var point in cameraPoints)
         {
             if (point.point == null)
                 continue;
-
             float elapsed = 0f;
             Vector3 startPos = mainCamera.transform.position;
             Quaternion startRot = mainCamera.transform.rotation;
-
             while (elapsed < point.transitionDuration)
             {
                 elapsed += Time.deltaTime;
@@ -357,7 +337,6 @@ public class StoryNode : MonoBehaviour
                 yield return null;
             }
         }
-
         if (returnCameraToPlayer)
         {
             float returnDuration = 1f;
@@ -382,7 +361,6 @@ public class StoryNode : MonoBehaviour
         DebugLog($"Waiting for {duration} seconds");
         yield return new WaitForSeconds(duration);
         timeElapsed = true;
-
         if (waitForUIButton && continueButton != null)
         {
             continueButton.gameObject.SetActive(true);
@@ -390,22 +368,11 @@ public class StoryNode : MonoBehaviour
         }
         else
         {
+            // First activate next node while still active...
+            ActivateNextNode();
+            // Then deactivate this node.
             DeactivateNode();
-            yield return StartCoroutine(CompleteNodeSequence());
         }
-    }
-
-    // Coroutine to ensure the next node is activated after deactivation is complete.
-    private IEnumerator CompleteNodeSequence()
-    {
-        // Wait one frame to guarantee all deactivation logic is complete.
-        yield return new WaitForEndOfFrame();
-#if UNITY_EDITOR
-        // Ensure the Editor isn't paused.
-        if (UnityEditor.EditorApplication.isPaused)
-            UnityEditor.EditorApplication.isPaused = false;
-#endif
-        ActivateNextNode();
     }
 
     public void OnContinueButtonPressed()
@@ -415,15 +382,15 @@ public class StoryNode : MonoBehaviour
             DebugLog($"Invalid continue button press state - Active: {isActiveAndEnabled}, Triggered: {triggered}, TimeElapsed: {timeElapsed}");
             return;
         }
-
         DebugLog("Continue button pressed!");
         if (continueButton != null)
         {
             continueButton.gameObject.SetActive(false);
         }
-
+        // First activate next node...
+        ActivateNextNode();
+        // Then deactivate this node.
         DeactivateNode();
-        StartCoroutine(CompleteNodeSequence());
     }
 
     public void ForceReset()
@@ -455,18 +422,14 @@ public class StoryNode : MonoBehaviour
         try
         {
             DebugLog($"Deactivating node: {gameObject.name}");
-
             foreach (var element in storyElements)
             {
                 if (element != null)
                     element.SetActive(false);
             }
-
             ResetObjects();
-
             // Restore player's movement state.
             RestorePlayerState();
-
             if (triggerOnce)
             {
                 foreach (var obj in objectsToPermanentlyDisable)
@@ -478,14 +441,12 @@ public class StoryNode : MonoBehaviour
                     }
                 }
             }
-
             SaveNodeState();
             onNodeDeactivate?.Invoke();
-
             if (triggerOnce)
             {
                 gameObject.SetActive(false);
-                DebugLog("Node has been deactivated and set inactive (triggerOnce).");
+                DebugLog("Node deactivated and set inactive (triggerOnce).");
             }
             else
             {
@@ -577,13 +538,11 @@ public class StoryNode : MonoBehaviour
 
     private void SaveNodeState()
     {
-        // Skip saving if in dev mode.
         if (devMode)
         {
             DebugLog("Dev mode enabled - skipping save.");
             return;
         }
-
         try
         {
             NodeSaveData saveData = new NodeSaveData(nodeId)
@@ -591,12 +550,10 @@ public class StoryNode : MonoBehaviour
                 hasBeenTriggered = triggered,
                 variables = new List<SerializableKeyValuePair>()
             };
-
             foreach (var kvp in variables)
             {
                 saveData.variables.Add(new SerializableKeyValuePair { key = kvp.Key, value = kvp.Value });
             }
-
             string json = JsonUtility.ToJson(saveData);
             PlayerPrefs.SetString($"StoryNode_{nodeId}", json);
             PlayerPrefs.Save();
@@ -610,7 +567,6 @@ public class StoryNode : MonoBehaviour
 
     private void LoadNodeState()
     {
-        // Skip loading if in dev mode; start fresh.
         if (devMode)
         {
             DebugLog("Dev mode enabled - skipping load and clearing saved state.");
@@ -619,7 +575,6 @@ public class StoryNode : MonoBehaviour
             variables = new Dictionary<string, float>();
             return;
         }
-
         try
         {
             string json = PlayerPrefs.GetString($"StoryNode_{nodeId}", "");
