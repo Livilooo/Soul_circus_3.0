@@ -184,8 +184,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneAsset: {fileID: 102900000, guid: 0f449dcb4506dbd438cee641224dc970, type: 3}
   sceneName: Ocean 4
-  loadDistance: 500
-  unloadDistance: 750
+  loadDistance: 1000
+  unloadDistance: 2500
   unloadDelay: 0
   player: {fileID: 1271217740}
 --- !u!4 &57481889
@@ -665,8 +665,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneAsset: {fileID: 102900000, guid: b20d6d6c9d07e044dac35e96156b2379, type: 3}
   sceneName: Ocean 5
-  loadDistance: 500
-  unloadDistance: 750
+  loadDistance: 1000
+  unloadDistance: 2500
   unloadDelay: 0
   player: {fileID: 1271217740}
 --- !u!4 &248623646
@@ -1114,56 +1114,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &385485427
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 385485429}
-  - component: {fileID: 385485428}
-  m_Layer: 0
-  m_Name: Decaying Grotos sensor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &385485428
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385485427}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 956271e91ad21164a99e1f39f9e7e5d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneAsset: {fileID: 102900000, guid: f0360cf16f5440942a8c6b7dfeab5b77, type: 3}
-  sceneName: Decaying_Grottos
-  loadDistance: 250
-  unloadDistance: 300
-  unloadDelay: 0.01
-  player: {fileID: 0}
---- !u!4 &385485429
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385485427}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 43.3, y: -0.63, z: 149.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2046205836}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &448050430
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,13 +1153,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 448050430}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsGlobal: 1
-  priority: 0
+  priority: 1
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 71dd8764ac8462e48bcd5f1c308472df, type: 2}
@@ -1229,7 +1179,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 23
   m_IsActive: 1
 --- !u!114 &452329223
 MonoBehaviour:
@@ -1576,7 +1526,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 812101012}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &636553294
 GameObject:
@@ -2281,6 +2231,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 709306364}
   m_CullTransparentMesh: 1
+--- !u!1 &728199214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 728199215}
+  m_Layer: 0
+  m_Name: DecayingGrotosTarget1 (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &728199215
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728199214}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.024539141, y: -0.98992753, z: -0.0034553043, w: 0.1393896}
+  m_LocalPosition: {x: 49.12, y: 4.79, z: 11.26}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1687225969}
+  m_LocalEulerAnglesHint: {x: 0, y: -163.97, z: -2.84}
 --- !u!1 &732606119
 GameObject:
   m_ObjectHideFlags: 0
@@ -2686,7 +2667,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 618939314}
   - {fileID: 448050432}
   - {fileID: 452329225}
   m_Father: {fileID: 0}
@@ -2801,11 +2781,11 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -3969,8 +3949,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneAsset: {fileID: 102900000, guid: ebf6f784ba002db4ca5b00b87c905869, type: 3}
   sceneName: Ocean 2
-  loadDistance: 500
-  unloadDistance: 750
+  loadDistance: 1000
+  unloadDistance: 2500
   unloadDelay: 0
   player: {fileID: 1271217740}
 --- !u!4 &1329446277
@@ -4488,8 +4468,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneAsset: {fileID: 102900000, guid: 50d777b91aaa1a14d92f3d4f71be5980, type: 3}
   sceneName: Ocean 3
-  loadDistance: 500
-  unloadDistance: 750
+  loadDistance: 1000
+  unloadDistance: 2500
   unloadDelay: 0
   player: {fileID: 1271217740}
 --- !u!4 &1594068146
@@ -4611,6 +4591,7 @@ Transform:
   - {fileID: 2138126673}
   - {fileID: 1067122821}
   - {fileID: 1797412114}
+  - {fileID: 728199215}
   - {fileID: 1979899502}
   - {fileID: 47954349}
   m_Father: {fileID: 732606120}
@@ -5330,6 +5311,32 @@ MonoBehaviour:
       m_RotationOrder: 4
   - point: {fileID: 1979899502}
     transitionDuration: 10
+    transitionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - point: {fileID: 728199215}
+    transitionDuration: 5
     transitionCurve:
       serializedVersion: 2
       m_Curve:
@@ -6233,7 +6240,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 385485429}
   - {fileID: 1329446277}
   - {fileID: 2140637782}
   - {fileID: 1594068146}
@@ -6544,8 +6550,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneAsset: {fileID: 102900000, guid: f1ddd478d390f7743baabf3c6ea16cb1, type: 3}
   sceneName: Ocean 1
-  loadDistance: 500
-  unloadDistance: 750
+  loadDistance: 1000
+  unloadDistance: 2500
   unloadDelay: 0
   player: {fileID: 1271217740}
 --- !u!4 &2140637782
@@ -6573,4 +6579,5 @@ SceneRoots:
   - {fileID: 354912472}
   - {fileID: 1019548384}
   - {fileID: 1468739293}
+  - {fileID: 618939314}
   - {fileID: 812101012}
