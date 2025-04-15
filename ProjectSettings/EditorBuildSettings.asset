@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Ocean.unity
     guid: eaa18fa73ba4f98438745eba9536a39c
   - enabled: 1
+    path: Assets/Scenes/Ocean 5.unity
+    guid: b20d6d6c9d07e044dac35e96156b2379
+  - enabled: 1
     path: Assets/Scenes/Ocean 1.unity
     guid: f1ddd478d390f7743baabf3c6ea16cb1
   - enabled: 1
