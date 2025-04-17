@@ -6055,7 +6055,7 @@ MonoBehaviour:
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
   restorePlayerMovementOnComplete: 1
-  activeDuration: 3
+  activeDuration: 2
   waitForUIButton: 1
   continueButton: {fileID: 2096135810}
   cameraPoints: []
