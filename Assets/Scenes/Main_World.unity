@@ -630,7 +630,6 @@ Transform:
   - {fileID: 896120256}
   - {fileID: 1494398129}
   - {fileID: 2006444343}
-  - {fileID: 917670989}
   - {fileID: 312569648}
   m_Father: {fileID: 1019548384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -971,20 +970,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 0
   nodeId: 6f8d052d-be84-42c5-8ad2-c20b7e60f2be
   storyElements: []
   objectsToDisable: []
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 1
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 5
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
   cameraPoints: []
   returnCameraToPlayer: 1
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 0
   isLastNodeInChain: 0
   nextNode: {fileID: 0}
   triggerOnce: 1
-  activeDuration: 5
-  waitForUIButton: 0
-  continueButton: {fileID: 0}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -992,7 +994,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 0
 --- !u!65 &312569647
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2642,6 +2643,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 1746447440}
@@ -2650,15 +2652,17 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 3
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
   cameraPoints: []
   returnCameraToPlayer: 0
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 1
   isLastNodeInChain: 0
   nextNode: {fileID: 896120257}
   triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 0
-  continueButton: {fileID: 0}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -2666,7 +2670,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &793545310
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2898,6 +2901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 86441080}
@@ -2906,15 +2910,17 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 3
+  waitForUIButton: 1
+  continueButton: {fileID: 1273384419}
   cameraPoints: []
   returnCameraToPlayer: 0
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 1
   isLastNodeInChain: 0
   nextNode: {fileID: 1494398130}
   triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 1
-  continueButton: {fileID: 1273384419}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -2922,7 +2928,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &896120258
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2930,96 +2935,6 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 896120255}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &917670988
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 917670989}
-  - component: {fileID: 917670991}
-  - component: {fileID: 917670990}
-  m_Layer: 0
-  m_Name: Meet_Mushu_2 (5)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &917670989
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 917670988}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.26171666, z: -0, w: 0.96514475}
-  m_LocalPosition: {x: 27.232, y: 2.758, z: 9.845}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 239002968}
-  m_LocalEulerAnglesHint: {x: 0, y: -30.344, z: 0}
---- !u!114 &917670990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 917670988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcdc65b374fb10c4e828b424c2d332fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  showDebugLogs: 1
-  nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
-  storyElements: []
-  objectsToDisable:
-  - {fileID: 1993097698}
-  objectsToPermanentlyDisable: []
-  allowPlayerMovementDuringNode: 0
-  cameraPoints: []
-  returnCameraToPlayer: 1
-  isPartOfChainedSequence: 1
-  isLastNodeInChain: 1
-  nextNode: {fileID: 0}
-  triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 1
-  continueButton: {fileID: 2096135810}
-  choices: []
-  onNodeActivate:
-    m_PersistentCalls:
-      m_Calls: []
-  onNodeDeactivate:
-    m_PersistentCalls:
-      m_Calls: []
-  devMode: 1
---- !u!65 &917670991
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 917670988}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -4442,6 +4357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 1664819562}
@@ -4450,15 +4366,17 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 3
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
   cameraPoints: []
   returnCameraToPlayer: 0
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 1
   isLastNodeInChain: 0
   nextNode: {fileID: 2006444344}
   triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 0
-  continueButton: {fileID: 0}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -4466,7 +4384,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &1494398131
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4796,6 +4713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 180747378}
@@ -4804,6 +4722,10 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 3
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
   cameraPoints:
   - point: {fileID: 47954349}
     transitionDuration: 2
@@ -4832,13 +4754,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   returnCameraToPlayer: 0
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 1
   isLastNodeInChain: 0
   nextNode: {fileID: 2012772542}
   triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 0
-  continueButton: {fileID: 0}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -4846,7 +4766,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &1958591277
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5275,12 +5194,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 0
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 481757402}
   objectsToDisable: []
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 0.5
+  waitForUIButton: 0
+  continueButton: {fileID: 0}
   cameraPoints:
   - point: {fileID: 2138126673}
     transitionDuration: 10
@@ -5413,13 +5337,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   returnCameraToPlayer: 1
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 0
   isLastNodeInChain: 0
   nextNode: {fileID: 0}
   triggerOnce: 1
-  activeDuration: 0.5
-  waitForUIButton: 0
-  continueButton: {fileID: 0}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -5427,7 +5349,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 0
 --- !u!65 &1989935179
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6124,6 +6045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 1400844901}
@@ -6132,15 +6054,17 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
-  cameraPoints: []
-  returnCameraToPlayer: 0
-  isPartOfChainedSequence: 1
-  isLastNodeInChain: 0
-  nextNode: {fileID: 917670990}
-  triggerOnce: 1
+  restorePlayerMovementOnComplete: 1
   activeDuration: 3
   waitForUIButton: 1
   continueButton: {fileID: 2096135810}
+  cameraPoints: []
+  returnCameraToPlayer: 1
+  returnToFirstNodeCamera: 1
+  isPartOfChainedSequence: 1
+  isLastNodeInChain: 1
+  nextNode: {fileID: 0}
+  triggerOnce: 1
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -6148,7 +6072,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &2006444345
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6216,6 +6139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showDebugLogs: 1
+  devMode: 1
   nodeId: 6daee879-743c-42d4-b856-25c101cce7e1
   storyElements:
   - {fileID: 1960736001}
@@ -6224,15 +6148,17 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
+  restorePlayerMovementOnComplete: 0
+  activeDuration: 3
+  waitForUIButton: 1
+  continueButton: {fileID: 1311273018}
   cameraPoints: []
   returnCameraToPlayer: 0
+  returnToFirstNodeCamera: 0
   isPartOfChainedSequence: 1
   isLastNodeInChain: 0
   nextNode: {fileID: 793545309}
   triggerOnce: 1
-  activeDuration: 3
-  waitForUIButton: 1
-  continueButton: {fileID: 1311273018}
   choices: []
   onNodeActivate:
     m_PersistentCalls:
@@ -6240,7 +6166,6 @@ MonoBehaviour:
   onNodeDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  devMode: 1
 --- !u!65 &2012772543
 BoxCollider:
   m_ObjectHideFlags: 0
