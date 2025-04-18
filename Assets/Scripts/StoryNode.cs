@@ -1,15 +1,15 @@
 /*
 * StoryNode.cs
-* Last Modified: 2025-04-17 20:12:30 UTC
+* Last Modified: 2025-04-18 19:45:30 UTC
 * Modified By: OmniDev951
 *
 * This script handles story node sequences in Unity with fixes for:
 * - Fixed movement restoration in chained sequences
-* - Fixed temporary and permanent object disabling
+* - Fixed temporary and permanent object disabling for chained nodes
 * - Improved movement state handling in chains
 * - Added null checks for object arrays
 * - Added detailed debug logging
-* - Fixed chain sequence completion states
+* - Fixed chain sequence completion states and ensured player movement restoration
 */
 
 using System;
@@ -445,7 +445,7 @@ public class StoryNode : MonoBehaviour
 
     private void ProcessNodeActivation()
     {
-        // Only update movement if this is a standalone node or we explicitly allow movement
+        // For standalone nodes, enforce movement state if allowed
         if ((!isInChainedSequence || !isPartOfChainedSequence) && allowPlayerMovementDuringNode)
         {
             UpdatePlayerMovement(true);
@@ -468,8 +468,12 @@ public class StoryNode : MonoBehaviour
     private void HandleActivationError(Exception e)
     {
         Debug.LogError($"[StoryNode] Error in ActivateNode: {e.Message}");
-        RestorePlayerState();
-        EnsurePlayerMovementRestored();
+        // For chained nodes, do not override stored player state until the final node completes.
+        if (!isPartOfChainedSequence)
+        {
+            RestorePlayerState();
+            EnsurePlayerMovementRestored();
+        }
         isProcessing = false;
         
         if (isPartOfChainedSequence && isLastNodeInChain)
@@ -508,7 +512,7 @@ public class StoryNode : MonoBehaviour
 
             DeactivateNode();
 
-            // Final safety check for player movement
+            // Final safety check for player movement (only for non-chained or final node)
             if (isLastNodeInChain || !isPartOfChainedSequence)
             {
                 EnsurePlayerMovementRestored();
@@ -556,18 +560,19 @@ public class StoryNode : MonoBehaviour
         continueButton.gameObject.SetActive(false);
     }
 
+    // Modified ProcessSequenceEnd to ensure proper restoration
     private IEnumerator ProcessSequenceEnd()
     {
         bool shouldActivateNext = nextNode != null;
 
-        // Only restore movement if this is the end of a chain or a standalone node
-        if ((!isPartOfChainedSequence || isLastNodeInChain) && 
-            (restorePlayerMovementOnComplete || !isPartOfChainedSequence))
+        // For standalone nodes or the last node in a chain, restore player movement if configured
+        if ((!isPartOfChainedSequence || isLastNodeInChain) && restorePlayerMovementOnComplete)
         {
             RestorePlayerState();
-            DebugLog("Restored player movement at sequence end");
+            DebugLog("Restored player movement at sequence end.");
         }
 
+        // Only in non-chained or final chained node, perform end-of-sequence state restoration
         if (isLastNodeInChain || !isPartOfChainedSequence)
         {
             yield return StartCoroutine(RestoreStatesAtEndOfSequence());
@@ -587,12 +592,16 @@ public class StoryNode : MonoBehaviour
     private void DeactivateNode()
     {
         DeactivateStoryElements();
-        ResetObjects();
-        
-        if (isLastNodeInChain || !isPartOfChainedSequence)
+        // For chained nodes that are not final, do not reset temporarily disabled objects
+        if (!isPartOfChainedSequence || isLastNodeInChain)
         {
+            ResetObjects();
             RestorePlayerState();
             EnsurePlayerMovementRestored();
+        }
+        else
+        {
+            DebugLog("Intermediate chained node deactivated; temporary object states preserved.");
         }
 
         HandleTriggerOnceCleanup();
@@ -688,7 +697,7 @@ public class StoryNode : MonoBehaviour
 
     private void ResetObjects()
     {
-        // Only re-enable temporarily disabled objects
+        // Re-enable temporarily disabled objects only for standalone nodes or final chained node.
         if (objectsToDisable != null)
         {
             foreach (var obj in objectsToDisable)
@@ -746,10 +755,14 @@ public class StoryNode : MonoBehaviour
 
     private void RestorePlayerState()
     {
+        // Only restore if not in an intermediate chain node.
         if (playerController != null && hasStoredPlayerState)
         {
             playerController.canMove = wasPlayerMovementEnabled;
-            hasStoredPlayerState = false;
+            if (!isPartOfChainedSequence)
+            {
+                hasStoredPlayerState = false;
+            }
             DebugLog($"Restored player movement to: {wasPlayerMovementEnabled}");
         }
     }
