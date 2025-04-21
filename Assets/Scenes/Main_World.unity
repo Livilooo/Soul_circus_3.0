@@ -6054,7 +6054,7 @@ MonoBehaviour:
   - {fileID: 1993097698}
   objectsToPermanentlyDisable: []
   allowPlayerMovementDuringNode: 0
-  restorePlayerMovementOnComplete: 0
+  restorePlayerMovementOnComplete: 1
   activeDuration: 2
   waitForUIButton: 1
   continueButton: {fileID: 2096135810}
