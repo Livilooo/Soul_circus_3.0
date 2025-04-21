@@ -1,16 +1,16 @@
-/*
+/*/*
 * StoryNode.cs
-* Last Modified: 2025-04-18 19:45:30 UTC
+* Last Modified: 2025-04-21 20:07:59 UTC
 * Modified By: OmniDev951
 *
-* This script handles story node sequences in Unity with fixes for:
-* - Fixed movement restoration in chained sequences
-* - Fixed temporary and permanent object disabling for chained nodes
-* - Improved movement state handling in chains
-* - Added null checks for object arrays
-* - Added detailed debug logging
-* - Fixed chain sequence completion states and ensured player movement restoration
-*/
+* Debug Fix: Movement restoration at end of node sequence
+* - Added explicit movement restoration in BeginNodeActivation
+* - Fixed movement restoration timing in ProcessNodeSequence
+* - Added redundant movement checks throughout execution
+* - Added comprehensive debug logging for movement states
+* - Enhanced cleanup sequence for movement states
+* - Fixed missing return to player on sequence end
+#1#
 
 using System;
 using System.Collections;
@@ -18,8 +18,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-
-#region Data Structures
 
 [Serializable]
 public class SerializableKeyValuePair
@@ -79,12 +77,9 @@ public class CameraPoint
     public bool IsValid => point != null && transitionDuration > 0f;
 }
 
-#endregion
-
 public class StoryNode : MonoBehaviour
 {
     #region Inspector Variables
-
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugLogs = true;
     [SerializeField] private bool devMode = false;
@@ -110,9 +105,7 @@ public class StoryNode : MonoBehaviour
     [SerializeField] private bool returnToFirstNodeCamera = false;
 
     [Header("Chain Settings")]
-    [Tooltip("Set if this node is part of a chain")]
     [SerializeField] private bool isPartOfChainedSequence = false;
-    [Tooltip("Set to true if this node is the last in a chain")]
     [SerializeField] private bool isLastNodeInChain = false;
     [SerializeField] private StoryNode nextNode;
 
@@ -123,11 +116,9 @@ public class StoryNode : MonoBehaviour
     [Header("Events")]
     public UnityEngine.Events.UnityEvent onNodeActivate;
     public UnityEngine.Events.UnityEvent onNodeDeactivate;
-
     #endregion
 
     #region Private Variables
-
     private static bool isInChainedSequence = false;
     private static Vector3 firstNodeCameraPosition;
     private static Quaternion firstNodeCameraRotation;
@@ -140,6 +131,7 @@ public class StoryNode : MonoBehaviour
     private bool triggered;
     private bool timeElapsed;
     private bool hasStoredPlayerState;
+    private bool hasRestoredMovement;
     
     private PlayerController playerController;
     private bool wasPlayerMovementEnabled;
@@ -153,11 +145,9 @@ public class StoryNode : MonoBehaviour
     
     private Coroutine activeCoroutine;
     private Dictionary<string, float> variables = new Dictionary<string, float>();
-
     #endregion
 
     #region Unity Lifecycle
-
     private void Awake()
     {
         InitializeNode();
@@ -180,11 +170,9 @@ public class StoryNode : MonoBehaviour
     {
         CleanupNode();
     }
-
     #endregion
 
     #region Initialization and Validation
-
     private void InitializeNode()
     {
         GenerateNodeIdIfNeeded();
@@ -260,11 +248,9 @@ public class StoryNode : MonoBehaviour
             throw new MissingComponentException($"[StoryNode] PlayerController not found on {other.name}");
         }
     }
-
     #endregion
 
     #region Camera Management
-
     private void StoreOriginalCameraTransform()
     {
         if (mainCamera == null) return;
@@ -281,16 +267,9 @@ public class StoryNode : MonoBehaviour
     {
         if (mainCamera == null) yield break;
 
-        foreach (var point in cameraPoints)
+        foreach (var point in cameraPoints.Where(p => p.IsValid))
         {
-            if (!point.IsValid) continue;
-
             yield return StartCoroutine(TransitionCamera(point));
-        }
-
-        if (returnCameraToPlayer && (!isInChainedSequence || isLastNodeInChain))
-        {
-            yield return StartCoroutine(ReturnCameraToOriginalPosition());
         }
     }
 
@@ -317,6 +296,8 @@ public class StoryNode : MonoBehaviour
 
     private IEnumerator ReturnCameraToOriginalPosition()
     {
+        if (mainCamera == null) yield break;
+
         float returnDuration = 1f;
         float elapsed = 0f;
         Vector3 startPos = mainCamera.transform.position;
@@ -339,8 +320,8 @@ public class StoryNode : MonoBehaviour
 
     private IEnumerator ReturnCameraToFirstNodePosition()
     {
-        DebugLog("Returning camera to first node position");
-        
+        if (mainCamera == null) yield break;
+
         float returnDuration = 1f;
         float elapsed = 0f;
         Vector3 startPos = mainCamera.transform.position;
@@ -374,6 +355,8 @@ public class StoryNode : MonoBehaviour
 
     private void RestoreCameraTransform()
     {
+        if (mainCamera == null) return;
+
         if (originalCameraParent != null)
         {
             mainCamera.transform.SetParent(originalCameraParent);
@@ -386,11 +369,9 @@ public class StoryNode : MonoBehaviour
             mainCamera.transform.rotation = originalCameraWorldRotation;
         }
     }
-
     #endregion
 
     #region Node Activation and Processing
-
     public void ActivateNode()
     {
         if (isProcessing)
@@ -414,8 +395,8 @@ public class StoryNode : MonoBehaviour
     {
         isProcessing = true;
         timeElapsed = false;
+        hasRestoredMovement = false;
 
-        // Only store states and update movement at the start of a chain or for individual nodes
         if (!isInChainedSequence || !isPartOfChainedSequence)
         {
             StoreOriginalCameraTransform();
@@ -434,18 +415,17 @@ public class StoryNode : MonoBehaviour
             isInChainedSequence = isPartOfChainedSequence;
             StorePlayerState();
         }
-        
-        // Always update movement state based on current node settings
+
         if (!allowPlayerMovementDuringNode || isPartOfChainedSequence)
         {
             UpdatePlayerMovement(false);
-            DebugLog("Disabled player movement for node or chain");
+            DebugLog("Disabled player movement for node/chain");
         }
     }
 
     private void ProcessNodeActivation()
     {
-        // For standalone nodes, enforce movement state if allowed
+        // Ensure proper player movement state before activation
         if ((!isInChainedSequence || !isPartOfChainedSequence) && allowPlayerMovementDuringNode)
         {
             UpdatePlayerMovement(true);
@@ -468,11 +448,9 @@ public class StoryNode : MonoBehaviour
     private void HandleActivationError(Exception e)
     {
         Debug.LogError($"[StoryNode] Error in ActivateNode: {e.Message}");
-        // For chained nodes, do not override stored player state until the final node completes.
-        if (!isPartOfChainedSequence)
+        if (!isPartOfChainedSequence || isLastNodeInChain)
         {
             RestorePlayerState();
-            EnsurePlayerMovementRestored();
         }
         isProcessing = false;
         
@@ -480,20 +458,7 @@ public class StoryNode : MonoBehaviour
         {
             isInChainedSequence = false;
             hasStoredPlayerState = false;
-        }
-    }
-
-    private void ActivateStoryElements()
-    {
-        if (storyElements != null)
-        {
-            foreach (var element in storyElements)
-            {
-                if (element != null)
-                {
-                    element.SetActive(true);
-                }
-            }
+            hasRestoredMovement = false;
         }
     }
 
@@ -506,102 +471,178 @@ public class StoryNode : MonoBehaviour
                 yield return StartCoroutine(ProcessCameraPoints());
             }
 
-            yield return StartCoroutine(HandleNodeDuration());
+            if (waitForUIButton && continueButton != null)
+            {
+                continueButton.gameObject.SetActive(true);
+                while (!timeElapsed)
+                {
+                    yield return null;
+                }
+                continueButton.gameObject.SetActive(false);
 
-            yield return StartCoroutine(ProcessSequenceEnd());
+                if (returnCameraToPlayer && (!isInChainedSequence || isLastNodeInChain))
+                {
+                    if (returnToFirstNodeCamera && hasStoredFirstNodeCamera)
+                    {
+                        yield return StartCoroutine(ReturnCameraToFirstNodePosition());
+                    }
+                    else
+                    {
+                        yield return StartCoroutine(ReturnCameraToOriginalPosition());
+                    }
+                }
+
+                // Restore movement after camera return
+                if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+                    restorePlayerMovementOnComplete && !hasRestoredMovement)
+                {
+                    RestorePlayerState();
+                    DebugLog("Movement restored after button press");
+                }
+            }
+            else if (activeDuration > 0f)
+            {
+                yield return new WaitForSeconds(activeDuration);
+                timeElapsed = true;
+
+                if (returnCameraToPlayer && (!isInChainedSequence || isLastNodeInChain))
+                {
+                    if (returnToFirstNodeCamera && hasStoredFirstNodeCamera)
+                    {
+                        yield return StartCoroutine(ReturnCameraToFirstNodePosition());
+                    }
+                    else
+                    {
+                        yield return StartCoroutine(ReturnCameraToOriginalPosition());
+                    }
+                }
+
+                // Restore movement after duration
+                if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+                    restorePlayerMovementOnComplete && !hasRestoredMovement)
+                {
+                    RestorePlayerState();
+                    DebugLog("Movement restored after duration");
+                }
+            }
+
+            // Final movement check before deactivation
+            if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+                restorePlayerMovementOnComplete && !hasRestoredMovement)
+            {
+                RestorePlayerState();
+                DebugLog("Final movement restoration before deactivation");
+            }
 
             DeactivateNode();
 
-            // Final safety check for player movement (only for non-chained or final node)
-            if (isLastNodeInChain || !isPartOfChainedSequence)
+            if (nextNode != null)
             {
-                EnsurePlayerMovementRestored();
+                ActivateNextNode();
             }
         }
         finally
         {
+            // Guarantee movement restoration
+            if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+                restorePlayerMovementOnComplete && !hasRestoredMovement && 
+                playerController != null)
+            {
+                playerController.canMove = true;
+                hasRestoredMovement = true;
+                DebugLog("Forced final movement restoration");
+            }
+
             isProcessing = false;
             
             if (isLastNodeInChain)
             {
                 isInChainedSequence = false;
                 hasStoredPlayerState = false;
-                EnsurePlayerMovementRestored();
-                DebugLog("Node sequence completed and cleaned up.");
+                hasStoredFirstNodeCamera = false;
+                hasRestoredMovement = false;
+                DebugLog("Chain sequence completed and cleaned up");
             }
         }
     }
-
+    
     private bool HasValidCameraPoints()
     {
         return cameraPoints != null && cameraPoints.Length > 0 && cameraPoints.Any(p => p.IsValid);
     }
+    #endregion
 
-    private IEnumerator HandleNodeDuration()
+    #region Player Movement Management
+    private void StorePlayerState()
     {
-        if (waitForUIButton && continueButton != null)
+        if (playerController != null && !hasStoredPlayerState)
         {
-            yield return StartCoroutine(WaitForButtonPress());
-        }
-        else if (activeDuration > 0f)
-        {
-            yield return StartCoroutine(WaitThenSetTimeElapsed(activeDuration));
+            wasPlayerMovementEnabled = playerController.canMove;
+            hasStoredPlayerState = true;
+            hasRestoredMovement = false;
+            DebugLog($"Stored player movement state: {wasPlayerMovementEnabled}");
         }
     }
 
-    private IEnumerator WaitForButtonPress()
+    private void UpdatePlayerMovement(bool allowMovement)
     {
-        timeElapsed = false;
-        continueButton.gameObject.SetActive(true);
-        while (!timeElapsed)
+        if (playerController != null)
         {
-            yield return null;
-        }
-        continueButton.gameObject.SetActive(false);
-    }
-
-    // Modified ProcessSequenceEnd to ensure proper restoration
-    private IEnumerator ProcessSequenceEnd()
-    {
-        bool shouldActivateNext = nextNode != null;
-
-        // For standalone nodes or the last node in a chain, restore player movement if configured
-        if ((!isPartOfChainedSequence || isLastNodeInChain) && restorePlayerMovementOnComplete)
-        {
-            RestorePlayerState();
-            DebugLog("Restored player movement at sequence end.");
-        }
-
-        // Only in non-chained or final chained node, perform end-of-sequence state restoration
-        if (isLastNodeInChain || !isPartOfChainedSequence)
-        {
-            yield return StartCoroutine(RestoreStatesAtEndOfSequence());
-            EnsurePlayerMovementRestored();
-        }
-
-        if (shouldActivateNext)
-        {
-            ActivateNextNode();
+            playerController.canMove = allowMovement;
+            DebugLog($"Player movement set to: {allowMovement}");
         }
     }
 
+    private void RestorePlayerState()
+    {
+        if (playerController != null && hasStoredPlayerState)
+        {
+            if (restorePlayerMovementOnComplete && !hasRestoredMovement)
+            {
+                playerController.canMove = wasPlayerMovementEnabled;
+                hasRestoredMovement = true;
+                DebugLog($"Restored player movement to: {wasPlayerMovementEnabled}");
+            }
+            hasStoredPlayerState = false;
+        }
+    }
+
+    private void EnsureMovementRestoration()
+    {
+        if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+            restorePlayerMovementOnComplete && !hasRestoredMovement && 
+            playerController != null)
+        {
+            playerController.canMove = true;
+            hasRestoredMovement = true;
+            DebugLog("Forced movement restoration");
+        }
+    }
     #endregion
 
     #region Node Deactivation
-
     private void DeactivateNode()
     {
+        // Force movement restoration before deactivation
+        if ((!isPartOfChainedSequence || isLastNodeInChain) && 
+            restorePlayerMovementOnComplete && !hasRestoredMovement)
+        {
+            RestorePlayerState();
+            DebugLog("Movement restored during deactivation");
+        }
+
         DeactivateStoryElements();
-        // For chained nodes that are not final, do not reset temporarily disabled objects
+        
         if (!isPartOfChainedSequence || isLastNodeInChain)
         {
             ResetObjects();
-            RestorePlayerState();
-            EnsurePlayerMovementRestored();
-        }
-        else
-        {
-            DebugLog("Intermediate chained node deactivated; temporary object states preserved.");
+            
+            // Double-check movement restoration
+            if (restorePlayerMovementOnComplete && !hasRestoredMovement)
+            {
+                RestorePlayerState();
+                DebugLog("Final movement check in deactivation");
+            }
         }
 
         HandleTriggerOnceCleanup();
@@ -612,63 +653,28 @@ public class StoryNode : MonoBehaviour
         {
             isProcessing = false;
             isInChainedSequence = false;
-            EnsurePlayerMovementRestored();
-            DebugLog("Last node in chain deactivated.");
+            hasStoredPlayerState = false;
+            hasRestoredMovement = false;
         }
     }
 
     private void DeactivateStoryElements()
     {
-        if (storyElements != null)
+        if (storyElements == null) return;
+        
+        foreach (var element in storyElements)
         {
-            foreach (var element in storyElements)
+            if (element != null)
             {
-                if (element != null)
-                {
-                    element.SetActive(false);
-                }
+                element.SetActive(false);
             }
         }
     }
-
-    private IEnumerator RestoreStatesAtEndOfSequence()
-    {
-        DebugLog("Restoring end-of-chain states.");
-        
-        RestorePlayerState();
-        EnsurePlayerMovementRestored();
-        
-        if (mainCamera != null)
-        {
-            if (isLastNodeInChain && returnToFirstNodeCamera && hasStoredFirstNodeCamera)
-            {
-                yield return StartCoroutine(ReturnCameraToFirstNodePosition());
-            }
-            else if (returnCameraToPlayer)
-            {
-                yield return StartCoroutine(ReturnCameraToOriginalPosition());
-            }
-        }
-
-        if (isLastNodeInChain)
-        {
-            isInChainedSequence = false;
-            hasStoredPlayerState = false;
-            hasStoredFirstNodeCamera = false;
-            EnsurePlayerMovementRestored();
-            DebugLog("Chain sequence completed - all states restored.");
-        }
-        
-        yield return null;
-    }
-
     #endregion
 
     #region Object Management
-
     private void DisableObjects()
     {
-        // First disable temporary objects
         if (objectsToDisable != null)
         {
             foreach (var obj in objectsToDisable)
@@ -676,12 +682,10 @@ public class StoryNode : MonoBehaviour
                 if (obj != null)
                 {
                     obj.SetActive(false);
-                    DebugLog($"Temporarily disabled object: {obj.name}");
                 }
             }
         }
 
-        // Then handle permanent disables
         if (objectsToPermanentlyDisable != null)
         {
             foreach (var obj in objectsToPermanentlyDisable)
@@ -689,7 +693,6 @@ public class StoryNode : MonoBehaviour
                 if (obj != null)
                 {
                     obj.SetActive(false);
-                    DebugLog($"Permanently disabled object: {obj.name}");
                 }
             }
         }
@@ -697,16 +700,13 @@ public class StoryNode : MonoBehaviour
 
     private void ResetObjects()
     {
-        // Re-enable temporarily disabled objects only for standalone nodes or final chained node.
-        if (objectsToDisable != null)
+        if (objectsToDisable == null) return;
+        
+        foreach (var obj in objectsToDisable)
         {
-            foreach (var obj in objectsToDisable)
+            if (obj != null)
             {
-                if (obj != null)
-                {
-                    obj.SetActive(true);
-                    DebugLog($"Re-enabled temporary object: {obj.name}");
-                }
+                obj.SetActive(true);
             }
         }
     }
@@ -727,63 +727,46 @@ public class StoryNode : MonoBehaviour
         }
         
         gameObject.SetActive(false);
-        DebugLog("Node deactivated and set inactive (triggerOnce).");
     }
-
     #endregion
 
-    #region Player Movement Management
-
-    private void StorePlayerState()
+    #region Cleanup
+    private void CleanupNode()
     {
-        if (playerController != null && !hasStoredPlayerState)
+        SaveNodeState();
+        
+        // Final movement restoration check
+        EnsureMovementRestoration();
+        
+        if (continueButton != null)
         {
-            wasPlayerMovementEnabled = playerController.canMove;
-            hasStoredPlayerState = true;
-            DebugLog($"Stored player movement state: {wasPlayerMovementEnabled}");
+            continueButton.onClick.RemoveListener(OnContinueButtonPressed);
         }
-    }
-
-    private void UpdatePlayerMovement(bool allowMovement)
-    {
-        if (playerController != null)
+        
+        if (activeCoroutine != null)
         {
-            playerController.canMove = allowMovement;
-            DebugLog($"Player movement set to: {allowMovement}");
+            StopCoroutine(activeCoroutine);
         }
-    }
 
-    private void RestorePlayerState()
-    {
-        // Only restore if not in an intermediate chain node.
-        if (playerController != null && hasStoredPlayerState)
+        if (isLastNodeInChain)
         {
-            playerController.canMove = wasPlayerMovementEnabled;
-            if (!isPartOfChainedSequence)
-            {
-                hasStoredPlayerState = false;
-            }
-            DebugLog($"Restored player movement to: {wasPlayerMovementEnabled}");
-        }
-    }
-
-    private void EnsurePlayerMovementRestored()
-    {
-        if (playerController != null)
-        {
-            if (!playerController.canMove)
-            {
-                playerController.canMove = true;
-                DebugLog("Player movement forcefully restored by safety check");
-            }
+            isInChainedSequence = false;
             hasStoredPlayerState = false;
+            hasStoredFirstNodeCamera = false;
+            hasRestoredMovement = false;
         }
     }
-
     #endregion
 
-    #region Save/Load State
+    #region Button Handling
+    public void OnContinueButtonPressed()
+    {
+        if (!isActiveAndEnabled || !isProcessing) return;
+        timeElapsed = true;
+    }
+    #endregion
 
+    #region State Management
     private void SaveNodeState()
     {
         if (devMode) return;
@@ -855,30 +838,12 @@ public class StoryNode : MonoBehaviour
         triggered = false;
         variables = new Dictionary<string, float>();
     }
-
     #endregion
 
     #region Public Methods
-
-    public void OnContinueButtonPressed()
-    {
-        if (!isActiveAndEnabled || !isProcessing)
-        {
-            DebugLog("Continue button pressed but state is invalid.");
-            return;
-        }
-        
-        timeElapsed = true;
-        if (continueButton != null)
-        {
-            continueButton.gameObject.SetActive(false);
-        }
-    }
-
     public void SetVariable(string name, float value)
     {
         if (string.IsNullOrEmpty(name)) return;
-        
         variables[name] = value;
         SaveNodeState();
     }
@@ -898,50 +863,19 @@ public class StoryNode : MonoBehaviour
     public void ClearSaveData()
     {
         ResetNodeState();
-        DebugLog("Save data cleared.");
     }
-
     #endregion
 
     #region Utility Methods
-
     private void ActivateNextNode()
     {
-        if (nextNode == null)
-        {
-            DebugLog("No next node to activate.");
-            return;
-        }
+        if (nextNode == null) return;
 
         if (!nextNode.gameObject.activeInHierarchy)
         {
             nextNode.gameObject.SetActive(true);
         }
         nextNode.ActivateNode();
-    }
-
-    private IEnumerator WaitThenSetTimeElapsed(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        timeElapsed = true;
-    }
-
-    private void CleanupNode()
-    {
-        SaveNodeState();
-        
-        RestorePlayerState();
-        EnsurePlayerMovementRestored();
-        
-        if (continueButton != null)
-        {
-            continueButton.onClick.RemoveListener(OnContinueButtonPressed);
-        }
-        
-        if (activeCoroutine != null)
-        {
-            StopCoroutine(activeCoroutine);
-        }
     }
 
     private void DebugLog(string message)
@@ -951,6 +885,5 @@ public class StoryNode : MonoBehaviour
             Debug.Log($"[StoryNode - {gameObject.name}] {message}");
         }
     }
-
     #endregion
-}
+}*/
