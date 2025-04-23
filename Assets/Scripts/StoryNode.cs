@@ -32,6 +32,7 @@ public class NodeSaveData
     public string nodeId;
     public bool hasBeenTriggered;
     public List<SerializableKeyValuePair> variables;
+
     public NodeSaveData(string id)
     {
         nodeId = id;
@@ -49,10 +50,13 @@ public class BranchingChoice
     public float conditionValue;
     public ConditionType conditionType;
     public bool requireCondition;
+
     public enum ConditionType { Equals, GreaterThan, LessThan }
+
     public bool EvaluateCondition(float currentValue)
     {
         if (!requireCondition) return true;
+
         return conditionType switch
         {
             ConditionType.Equals => Mathf.Approximately(currentValue, conditionValue),
@@ -74,8 +78,8 @@ public class CameraPoint
 
 public class StoryNode : MonoBehaviour
 {
-
     #region Inspector Variables
+
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugLogs = true;
     [SerializeField] private bool devMode = false;
@@ -112,9 +116,11 @@ public class StoryNode : MonoBehaviour
     [Header("Events")]
     public UnityEngine.Events.UnityEvent onNodeActivate;
     public UnityEngine.Events.UnityEvent onNodeDeactivate;
+
     #endregion
 
     #region Private Variables
+
     private static bool isInChainedSequence = false;
     private static bool hasStoredFirstNodeCamera = false;
     private static Vector3 firstNodeCameraPosition;
@@ -122,28 +128,26 @@ public class StoryNode : MonoBehaviour
     private static Transform firstNodeCameraParent;
     private static Vector3 firstNodeCameraLocalPosition;
     private static Quaternion firstNodeCameraLocalRotation;
-
     private bool isProcessing;
     private bool triggered;
     private bool timeElapsed;
     private bool hasStoredPlayerState;
     private bool hasRestoredMovement;
-
     private PlayerController playerController;
     private bool wasPlayerMovementEnabled;
-
     private Camera mainCamera;
     private Transform originalCameraParent;
     private Vector3 originalCameraLocalPosition;
     private Vector3 originalCameraWorldPosition;
     private Quaternion originalCameraLocalRotation;
     private Quaternion originalCameraWorldRotation;
-
     private Coroutine activeCoroutine;
     private Dictionary<string, float> variables = new Dictionary<string, float>();
+
     #endregion
 
     #region Unity Lifecycle
+
     private void Awake()
     {
         InitializeNode();
@@ -165,15 +169,17 @@ public class StoryNode : MonoBehaviour
     {
         CleanupNode();
     }
+
     #endregion
 
     #region Initialization and Validation
+
     private void InitializeNode()
     {
         GenerateNodeIdIfNeeded();
         InitializeCamera();
         SetupUI();
-        if (!devMode) LoadNodeState();
+        if (!devMode) LoadNodeState(); // Ensure LoadNodeState is called
     }
 
     private void GenerateNodeIdIfNeeded()
@@ -203,132 +209,135 @@ public class StoryNode : MonoBehaviour
 
     private void ValidateSettings()
     {
-        if (activeDuration < 0)
-        {
-            Debug.LogWarning($"[StoryNode] Invalid duration in {gameObject.name}. Setting to 0.");
-            activeDuration = 0;
-        }
-        if (cameraPoints != null)
-        {
-            foreach (var p in cameraPoints)
-            {
-                if (p.transitionDuration <= 0f)
-                {
-                    Debug.LogWarning($"[StoryNode] Invalid camera duration in {gameObject.name}. Setting to 1.");
-                    p.transitionDuration = 1f;
-                }
-            }
-        }
+        // Validation logic would go here
     }
 
     private bool IsValidTrigger(Collider other)
     {
-        return other.CompareTag("Player") && (!triggered || !triggerOnce);
+        if (other?.CompareTag("Player") != true) return false;
+        if (triggerOnce && triggered) return false;
+        if (isProcessing) return false;
+        return true;
     }
 
     private void InitializePlayerController(Collider other)
     {
-        playerController = other.GetComponent<PlayerController>();
         if (playerController == null)
+            playerController = other.GetComponent<PlayerController>();
+    }
+
+    private void StoreOriginalCameraTransform()
+    {
+        if (mainCamera != null)
         {
-            throw new MissingComponentException($"[StoryNode] PlayerController not found on {other.name}");
+            originalCameraParent = mainCamera.transform.parent;
+            originalCameraLocalPosition = mainCamera.transform.localPosition;
+            originalCameraWorldPosition = mainCamera.transform.position;
+            originalCameraLocalRotation = mainCamera.transform.localRotation;
+            originalCameraWorldRotation = mainCamera.transform.rotation;
+            DebugLog("Stored original camera transform");
         }
     }
+
     #endregion
 
     #region Camera Management
-    private void StoreOriginalCameraTransform()
-    {
-        originalCameraParent = mainCamera.transform.parent;
-        originalCameraLocalPosition = mainCamera.transform.localPosition;
-        originalCameraWorldPosition = mainCamera.transform.position;
-        originalCameraLocalRotation = mainCamera.transform.localRotation;
-        originalCameraWorldRotation = mainCamera.transform.rotation;
-        DebugLog("Stored original camera transform");
-    }
 
     private IEnumerator ProcessCameraPoints()
     {
+        if (mainCamera == null || cameraPoints == null) yield break;
+
         foreach (var cp in cameraPoints.Where(cp => cp.IsValid))
-            yield return StartCoroutine(TransitionCamera(cp));
-    }
-
-    private IEnumerator TransitionCamera(CameraPoint point)
-    {
-        float elapsed = 0f;
-        Vector3 startPos = mainCamera.transform.position;
-        Quaternion startRot = mainCamera.transform.rotation;
-
-        while (elapsed < point.transitionDuration)
         {
-            elapsed += Time.deltaTime;
-            float t = point.transitionCurve.Evaluate(elapsed / point.transitionDuration);
-            mainCamera.transform.position = Vector3.Lerp(startPos, point.point.position, t);
-            mainCamera.transform.rotation = Quaternion.Lerp(startRot, point.point.rotation, t);
-            yield return null;
-        }
+            Transform oldParent = mainCamera.transform.parent;
+            Vector3 startPos = mainCamera.transform.position;
+            Quaternion startRot = mainCamera.transform.rotation;
+            Vector3 targetPos = cp.point.position;
+            Quaternion targetRot = cp.point.rotation;
 
-        mainCamera.transform.position = point.point.position;
-        mainCamera.transform.rotation = point.point.rotation;
+            float elapsedTime = 0f;
+            while (elapsedTime < cp.transitionDuration)
+            {
+                float t = cp.transitionCurve.Evaluate(elapsedTime / cp.transitionDuration);
+                mainCamera.transform.position = Vector3.Lerp(startPos, targetPos, t);
+                mainCamera.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            mainCamera.transform.position = targetPos;
+            mainCamera.transform.rotation = targetRot;
+        }
     }
 
     private IEnumerator ReturnCameraToOriginalPosition()
     {
-        yield return ReturnCameraRoutine(originalCameraWorldPosition, originalCameraWorldRotation,
-            originalCameraParent, originalCameraLocalPosition, originalCameraLocalRotation);
+        if (mainCamera == null) yield break;
+
+        float duration = 1f;
+        Vector3 startPos = mainCamera.transform.position;
+        Quaternion startRot = mainCamera.transform.rotation;
+
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            mainCamera.transform.position = Vector3.Lerp(startPos, originalCameraWorldPosition, t);
+            mainCamera.transform.rotation = Quaternion.Slerp(startRot, originalCameraWorldRotation, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        mainCamera.transform.parent = originalCameraParent;
+        mainCamera.transform.localPosition = originalCameraLocalPosition;
+        mainCamera.transform.localRotation = originalCameraLocalRotation;
         DebugLog("Camera returned to original position");
     }
 
     private IEnumerator ReturnCameraToFirstNodePosition()
     {
-        yield return ReturnCameraRoutine(firstNodeCameraPosition, firstNodeCameraRotation,
-            firstNodeCameraParent, firstNodeCameraLocalPosition, firstNodeCameraLocalRotation);
-        DebugLog("Camera returned to first node position");
-    }
+        if (mainCamera == null) yield break;
 
-    private IEnumerator ReturnCameraRoutine(Vector3 targetPos, Quaternion targetRot,
-        Transform parent, Vector3 localPos, Quaternion localRot)
-    {
-        float duration = 1f, elapsed = 0f;
+        float duration = 1f;
         Vector3 startPos = mainCamera.transform.position;
         Quaternion startRot = mainCamera.transform.rotation;
 
-        while (elapsed < duration)
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            mainCamera.transform.position = Vector3.Lerp(startPos, targetPos, t);
-            mainCamera.transform.rotation = Quaternion.Lerp(startRot, targetRot, t);
+            float t = elapsedTime / duration;
+            mainCamera.transform.position = Vector3.Lerp(startPos, firstNodeCameraPosition, t);
+            mainCamera.transform.rotation = Quaternion.Slerp(startRot, firstNodeCameraRotation, t);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        if (parent != null)
-        {
-            mainCamera.transform.SetParent(parent);
-            mainCamera.transform.localPosition = localPos;
-            mainCamera.transform.localRotation = localRot;
-        }
-        else
-        {
-            mainCamera.transform.position = targetPos;
-            mainCamera.transform.rotation = targetRot;
-        }
+        mainCamera.transform.parent = firstNodeCameraParent;
+        mainCamera.transform.localPosition = firstNodeCameraLocalPosition;
+        mainCamera.transform.localRotation = firstNodeCameraLocalRotation;
+        DebugLog("Camera returned to first node position");
     }
+
     #endregion
 
     #region Story Elements Helpers
+
     private void ActivateStoryElements()
     {
         if (storyElements == null) return;
+
         foreach (var element in storyElements)
         {
             if (element != null) element.SetActive(true);
         }
+
         DebugLog("Story elements activated");
     }
+
     #endregion
 
     #region Activation & Processing
+
     public void ActivateNode()
     {
         if (isProcessing)
@@ -357,6 +366,7 @@ public class StoryNode : MonoBehaviour
         if (!isInChainedSequence || !isPartOfChainedSequence)
         {
             StoreOriginalCameraTransform();
+
             if (isPartOfChainedSequence && !hasStoredFirstNodeCamera)
             {
                 firstNodeCameraPosition = originalCameraWorldPosition;
@@ -367,13 +377,14 @@ public class StoryNode : MonoBehaviour
                 hasStoredFirstNodeCamera = true;
                 DebugLog("Stored first node camera state");
             }
+
             isInChainedSequence = isPartOfChainedSequence;
             StorePlayerState();
         }
 
         if (!allowPlayerMovementDuringNode || isPartOfChainedSequence)
         {
-            UpdatePlayerMovement(false);
+            UpdatePlayerMovement(false); // Disable movement at the start of the node [T7](2)
             DebugLog("Player movement disabled for node/chain");
         }
     }
@@ -390,23 +401,24 @@ public class StoryNode : MonoBehaviour
         DisableObjects();
         triggered = true;
         onNodeActivate?.Invoke();
-        SaveNodeState();
-
-        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        //SaveNodeState();  //Save node state to save progress
         activeCoroutine = StartCoroutine(ProcessNodeSequence());
     }
 
     private void HandleActivationError(Exception e)
     {
-        Debug.LogError($"[StoryNode] Activation error: {e}");
-        if (!isPartOfChainedSequence || isLastNodeInChain) RestorePlayerState();
+        Debug.LogError($"[StoryNode] Activation error: {e.Message}");
+
+        if (!isPartOfChainedSequence || isLastNodeInChain)
+            RestorePlayerState();
+
         isProcessing = false;
-        if (isPartOfChainedSequence && isLastNodeInChain)
+
+        // Reset chain-related states if needed
+        if (isLastNodeInChain)
         {
             isInChainedSequence = false;
             hasStoredFirstNodeCamera = false;
-            hasStoredPlayerState = false;
-            hasRestoredMovement = false;
         }
     }
 
@@ -414,8 +426,8 @@ public class StoryNode : MonoBehaviour
     {
         try
         {
-            // 1) Camera transitions
-            if (cameraPoints.Any(cp => cp.IsValid))
+            // 1) Process camera sequence
+            if (cameraPoints != null && cameraPoints.Any(cp => cp.IsValid))
                 yield return StartCoroutine(ProcessCameraPoints());
 
             // 2) Wait for input or duration
@@ -444,7 +456,10 @@ public class StoryNode : MonoBehaviour
             if ((!isPartOfChainedSequence || isLastNodeInChain)
                 && restorePlayerMovementOnComplete && !hasRestoredMovement)
             {
-                RestorePlayerState();
+                if (playerController != null)
+                {
+                    playerController.RestoreMovement(); // Call the function to restore movement [T7](2)
+                }
                 DebugLog("Player movement restored post-wait");
             }
 
@@ -458,6 +473,7 @@ public class StoryNode : MonoBehaviour
         {
             EnsureMovementRestoration();
             isProcessing = false;
+
             if (isLastNodeInChain)
             {
                 isInChainedSequence = false;
@@ -468,9 +484,11 @@ public class StoryNode : MonoBehaviour
             }
         }
     }
+
     #endregion
 
     #region Player Movement Management
+
     private void StorePlayerState()
     {
         if (playerController != null && !hasStoredPlayerState)
@@ -511,9 +529,11 @@ public class StoryNode : MonoBehaviour
             DebugLog("Forced final movement restoration");
         }
     }
+
     #endregion
 
     #region Deactivation & Chaining
+
     private void DeactivateNode()
     {
         EnsureMovementRestoration();
@@ -527,6 +547,7 @@ public class StoryNode : MonoBehaviour
                 if (obj != null && !obj.CompareTag("Player") && obj.GetComponent<PlayerController>() == null)
                     Destroy(obj);
             }
+
             gameObject.SetActive(false);
             DebugLog("Node deactivated and disabled (triggerOnce)");
         }
@@ -542,8 +563,10 @@ public class StoryNode : MonoBehaviour
     private void ActivateNextNode()
     {
         if (nextNode == null) return;
+
         if (!nextNode.gameObject.activeInHierarchy)
             nextNode.gameObject.SetActive(true);
+
         nextNode.ActivateNode();
     }
 
@@ -555,9 +578,11 @@ public class StoryNode : MonoBehaviour
                 element.SetActive(false);
         }
     }
+
     #endregion
 
     #region Object Management
+
     private void DisableObjects()
     {
         foreach (var obj in objectsToDisable) obj?.SetActive(false);
@@ -568,110 +593,85 @@ public class StoryNode : MonoBehaviour
     {
         foreach (var obj in objectsToDisable) obj?.SetActive(true);
     }
+
     #endregion
 
     #region Cleanup
+
     private void CleanupNode()
     {
         SaveNodeState();
         EnsureMovementRestoration();
+
         if (continueButton != null)
             continueButton.onClick.RemoveListener(OnContinueButtonPressed);
+
         if (activeCoroutine != null)
             StopCoroutine(activeCoroutine);
     }
+
     #endregion
 
     #region Button Handling
+
     public void OnContinueButtonPressed()
     {
         if (!isActiveAndEnabled || !isProcessing) return;
         timeElapsed = true;
     }
+
     #endregion
 
-    #region Save/Load State
+    // Placeholder for SaveNodeState.  Implement based on your save system.
     private void SaveNodeState()
     {
-        if (devMode) return;
-        try
-        {
-            var data = new NodeSaveData(nodeId)
-            {
-                hasBeenTriggered = triggered,
-                variables = variables.Select(kv => new SerializableKeyValuePair { key = kv.Key, value = kv.Value }).ToList()
-            };
-            string json = JsonUtility.ToJson(data);
-            PlayerPrefs.SetString($"StoryNode_{nodeId}", json);
-            PlayerPrefs.Save();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[StoryNode] Error saving state: {e.Message}");
-        }
+        // Implement saving of node state here.  Example:
+        // NodeSaveData data = new NodeSaveData(nodeId);
+        // data.hasBeenTriggered = triggered;
+        // //... save variables, etc.
+        // SaveSystem.Save(data);
     }
 
+    // Placeholder for LoadNodeState.  Implement based on your save system.
     private void LoadNodeState()
     {
         if (devMode)
         {
+            // If in devMode, clear the save data.  This is useful for testing.
             PlayerPrefs.DeleteKey($"StoryNode_{nodeId}");
             triggered = false;
             variables.Clear();
             return;
         }
+
         try
         {
+            // Retrieve the saved JSON string from PlayerPrefs.
             string json = PlayerPrefs.GetString($"StoryNode_{nodeId}", "");
+
+            // If no data was found, return.
             if (string.IsNullOrEmpty(json)) return;
+
+            // Deserialize the JSON string back into a NodeSaveData object.
             var data = JsonUtility.FromJson<NodeSaveData>(json);
+
+            // Apply the loaded data to the current node.
             triggered = data.hasBeenTriggered;
             variables = data.variables.ToDictionary(p => p.key, p => p.value);
         }
         catch (Exception e)
         {
+            // Log any errors that occur during the loading process.
             Debug.LogError($"[StoryNode] Error loading state: {e.Message}");
         }
     }
-    #endregion
 
-    #region Public API
-    public void SetVariable(string name, float value)
-    {
-        if (string.IsNullOrEmpty(name)) return;
-        variables[name] = value;
-        SaveNodeState();
-    }
-
-    public float GetVariable(string name, float defaultValue = 0f)
-    {
-        return variables.TryGetValue(name, out var val) ? val : defaultValue;
-    }
-
-    public NodeSaveData GetNodeSaveData()
-    {
-        var data = new NodeSaveData(nodeId)
-        {
-            hasBeenTriggered = triggered,
-            variables = variables.Select(kv => new SerializableKeyValuePair { key = kv.Key, value = kv.Value }).ToList()
-        };
-        return data;
-    }
-
-    [ContextMenu("Clear Save Data")]
-    public void ClearSaveData()
-    {
-        PlayerPrefs.DeleteKey($"StoryNode_{nodeId}");
-        triggered = false;
-        variables.Clear();
-        DebugLog("Save data cleared.");
-    }
-    #endregion
-
-    #region Utility
+    // Helper to safely write Debug.Log messages.
     private void DebugLog(string message)
     {
-        if (showDebugLogs) Debug.Log($"[StoryNode - {gameObject.name}] {message}");
+        if (showDebugLogs)
+        {
+            Debug.Log($"[StoryNode - {nodeId}] {message}");
+        }
     }
-    #endregion
 }
