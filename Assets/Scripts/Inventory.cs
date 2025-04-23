@@ -23,7 +23,12 @@ public class Inventory : MonoBehaviour
       for (int i = 0; i < slotAmount; i++)
       {
          items.Add(new Item());
+         
+         GameObject slot = Instantiate(inventorySlot);
+         slot.transform.SetParent(slotPanel.transform, false);
+         slots.Add(slot);
       }
+      AddItem(0);
    }
 
    public void AddItem(int id)
@@ -35,7 +40,9 @@ public class Inventory : MonoBehaviour
          {
             items[i] = itemToAdd;
             GameObject itemObj = Instantiate(inventoryItem);
-            itemObj.transform.SetParent(slots[i].transform);
+            itemObj.transform.SetParent(slots[i].transform, false);
+            itemObj.GetComponent<InventoryItem>().Setup(itemToAdd);
+            break;
          }
       }
    }
