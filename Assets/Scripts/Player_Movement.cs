@@ -101,4 +101,14 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    public void RestoreMovement()
+    {
+        canMove = true;
+    }
+
+    public void DisableMovement()
+    {
+        canMove = false;
+    }
 }
