@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+ 
+public class MenuAppearScript : MonoBehaviour {
+ 
+    public GameObject menu; // Assign in inspector
+    private bool isShowing;
 
-public class Inventory_switch : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+    void Update() {
+        if (Input.GetKeyDown("tab")) {
+            isShowing = !isShowing;
+            menu.SetActive(isShowing);
+        }
     }
 }
